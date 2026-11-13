@@ -1,0 +1,58 @@
+name: Build Windows
+
+# 定制开发用：仅构建 Windows 安装包与便携版，产物作为 Actions artifact 上传，不发布 Release。
+on:
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: 'Target architecture'
+        required: true
+        default: x64
+        type: choice
+        options:
+          - x64
+          - ia32
+          - arm64
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      npm_config_arch: ${{ inputs.arch }}
+      npm_config_target_arch: ${{ inputs.arch }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Prepare
+        run: pnpm prepare --${{ inputs.arch }}
+      - name: Build
+        run: pnpm build:win --${{ inputs.arch }}
+      - name: Add Portable Flag
+        run: |
+          New-Item -Path "PORTABLE" -ItemType File
+          Get-ChildItem dist/*portable.7z | ForEach-Object {
+            7z a $_.FullName PORTABLE
+          }
+      - name: Generate checksums
+        run: pnpm checksum setup.exe portable.7z
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: Windows ${{ inputs.arch }}
+          path: |
+            dist/*.sha256
+            dist/*setup.exe
+            dist/*portable.7z
+          if-no-files-found: error
