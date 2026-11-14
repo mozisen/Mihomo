@@ -93,6 +93,16 @@ import {
 } from '../sys/misc'
 import { getRuntimeConfig, getRuntimeConfigStr } from '../core/factory'
 import {
+  nexoCancel2fa,
+  nexoGetAccountState,
+  nexoGuardContext,
+  nexoLogin,
+  nexoLogin2fa,
+  nexoLogout,
+  nexoRefresh
+} from '../nexo/account'
+import { guardNexoHandlers } from '../nexo/ipcGuard'
+import {
   localSwitchNeedsDnsConfirm,
   setControlDns,
   takeDnsOverrideAutoDisabledNotice
@@ -263,7 +273,14 @@ async function setTitleBarOverlay(overlay: Electron.TitleBarOverlayOptions): Pro
   }
 }
 
-const asyncHandlers: Record<string, AsyncFn> = {
+const rawAsyncHandlers: Record<string, AsyncFn> = {
+  // NEXO account
+  nexoGetAccountState,
+  nexoLogin,
+  nexoLogin2fa,
+  nexoCancel2fa,
+  nexoLogout,
+  nexoRefresh,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,
@@ -436,6 +453,9 @@ const asyncHandlers: Record<string, AsyncFn> = {
   setTitleBarOverlay,
   registerShortcut
 }
+
+// NEXO 账户订阅受保护：渲染进程与 MCP 都不能读出或改写它的内容
+const asyncHandlers = guardNexoHandlers(rawAsyncHandlers, nexoGuardContext)
 
 const syncHandlers: Record<string, SyncFn> = {
   resetAppConfig,

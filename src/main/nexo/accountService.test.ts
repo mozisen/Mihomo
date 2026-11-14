@@ -11,7 +11,9 @@ function setup(opts: Parameters<typeof createTestMaster>[0] = {}, saved?: NexoSe
     fetch: master.fetch,
     issuerPublicKey: master.issuerPublicKey
   })
-  const store: { session?: NexoSession; profile?: string } = { session: saved }
+  const store: { session?: NexoSession; profile?: string; profileName?: string } = {
+    session: saved
+  }
   const states: string[] = []
   const service = new NexoAccountService({
     client,
@@ -23,8 +25,9 @@ function setup(opts: Parameters<typeof createTestMaster>[0] = {}, saved?: NexoSe
     clearSession: async () => {
       store.session = undefined
     },
-    applyProfile: async (content) => {
+    applyProfile: async (content, meta) => {
       store.profile = content
+      store.profileName = meta.name
     },
     removeProfile: async () => {
       store.profile = undefined
@@ -47,6 +50,7 @@ describe('NexoAccountService', () => {
     expect(store.session?.apiToken).toMatch(/^mmwx_/)
     expect(store.session?.tokenName).toBe('NEXO test-pc')
     expect(store.profile).toContain('proxies:')
+    expect(store.profileName).toBe('月付套餐')
     expect([...master.apiTokens.values()].map((t) => t.name)).toEqual(['NEXO test-pc'])
     // 不能调用会重置所有凭证的 POST /user/token
     expect(master.calls).not.toContain('POST /user/token')
@@ -71,9 +75,24 @@ describe('NexoAccountService', () => {
 
   it('rejects wrong credentials without storing anything', async () => {
     const { store, service } = setup()
+    await service.init()
     await expect(service.login('alice', 'nope')).rejects.toMatchObject({ status: 401 })
     expect(store.session).toBeUndefined()
     expect(service.getState().status).toBe('loggedOut')
+  })
+
+  it('treats an unreadable session file as logged out', async () => {
+    const { service, store } = setup()
+    store.profile = 'stale'
+    const broken = new NexoAccountService({
+      ...(service as unknown as { deps: ConstructorParameters<typeof NexoAccountService>[0] }).deps,
+      loadSession: async () => {
+        throw new Error('decrypt failed')
+      }
+    })
+    await broken.init()
+    expect(broken.getState().status).toBe('loggedOut')
+    expect(store.profile).toBeUndefined()
   })
 
   it('removes a leftover profile when started without a session', async () => {
@@ -81,6 +100,13 @@ describe('NexoAccountService', () => {
     store.profile = 'stale'
     await service.init()
     expect(store.profile).toBeUndefined()
+    expect(service.getState().status).toBe('loggedOut')
+  })
+
+  it('starts in a loading state until the saved session is read', async () => {
+    const { service } = setup()
+    expect(service.getState().status).toBe('loading')
+    await service.init()
     expect(service.getState().status).toBe('loggedOut')
   })
 
@@ -103,7 +129,8 @@ describe('NexoAccountService', () => {
       removeProfile: async () => {}
     })
     await service.init()
-    expect(service.getState()).toMatchObject({ status: 'loggedIn', syncing: true })
+    expect(service.getState()).toMatchObject({ status: 'loggedIn' })
+    expect(first.store.profile).toBeUndefined()
     await service.sync()
     expect(first.store.profile).toContain('proxies:')
     expect(service.getState()).toMatchObject({ status: 'loggedIn', syncing: false })
@@ -141,6 +168,16 @@ describe('NexoAccountService', () => {
     expect(master.apiTokens.size).toBe(0)
     expect(store.session).toBeUndefined()
     expect(store.profile).toBeUndefined()
+  })
+
+  it('does not write the profile back when logged out during a refresh', async () => {
+    const { store, service } = setup()
+    await service.login('alice', 'secret')
+    const pending = service.sync()
+    await service.logout()
+    await pending.catch(() => {})
+    expect(store.profile).toBeUndefined()
+    expect(service.getState().status).toBe('loggedOut')
   })
 
   it('merges concurrent refreshes into one request', async () => {

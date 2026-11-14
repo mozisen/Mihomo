@@ -8,8 +8,6 @@ import {
   type SubscriptionUserInfo
 } from './client'
 
-export const NEXO_PROFILE_ID = 'nexo'
-
 /** 加密保存在本机的会话（长期有效的个人 API 令牌，退出登录时吊销）。 */
 export interface NexoSession {
   username: string
@@ -35,6 +33,7 @@ export interface NexoAccountInfo {
 }
 
 export type NexoAccountState =
+  | { status: 'loading' }
   | { status: 'loggedOut'; error?: string }
   | { status: 'needs2fa' }
   | {
@@ -51,9 +50,14 @@ export interface NexoAccountDeps {
   saveSession: (session: NexoSession) => Promise<void>
   clearSession: () => Promise<void>
   /** 校验并以加密形式写入订阅，然后让内核使用它 */
-  applyProfile: (content: string) => Promise<void>
+  applyProfile: (
+    content: string,
+    meta: { name: string; userInfo?: SubscriptionUserInfo }
+  ) => Promise<void>
   /** 删除 NEXO 订阅（退出登录 / 会话失效） */
   removeProfile: () => Promise<void>
+  /** 启动时内核尚未运行：只清掉 NEXO 订阅记录与文件，不重启内核。缺省时用 removeProfile */
+  purgeProfileOffline?: () => Promise<void>
   onChange?: (state: NexoAccountState) => void
   now?: () => number
   log?: { info: (msg: string) => void; warn: (msg: string, e?: unknown) => void }
@@ -62,7 +66,7 @@ export interface NexoAccountDeps {
 export class NexoAccountService {
   private session?: NexoSession
   private pending2fa?: string
-  private state: NexoAccountState = { status: 'loggedOut' }
+  private state: NexoAccountState = { status: 'loading' }
   private syncPromise?: Promise<void>
 
   constructor(private readonly deps: NexoAccountDeps) {}
@@ -80,20 +84,31 @@ export class NexoAccountService {
     return (this.deps.now ?? Date.now)()
   }
 
-  /** 应用启动：有会话就直接视为已登录并在后台更新配置；没有会话就确保不残留 NEXO 订阅。 */
+  /**
+   * 应用启动（内核启动前）：有会话就保持登录，随后由调用方 sync() 更新配置；
+   * 没有会话就清掉残留的 NEXO 订阅，保证未登录时无法使用配置。
+   */
   async init(): Promise<void> {
-    this.session = await this.deps.loadSession()
+    try {
+      this.session = await this.deps.loadSession()
+    } catch (e) {
+      this.deps.log?.warn('Failed to load NEXO session', e)
+      this.session = undefined
+    }
     if (!this.session) {
-      await this.deps.removeProfile()
+      await (this.deps.purgeProfileOffline ?? this.deps.removeProfile)()
       this.setState({ status: 'loggedOut' })
       return
     }
     this.setState({
       status: 'loggedIn',
       account: this.session.account ?? { username: this.session.username },
-      syncing: true
+      syncing: false
     })
-    void this.sync().catch(() => {})
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.session
   }
 
   async login(username: string, password: string): Promise<NexoAccountState> {
@@ -159,9 +174,13 @@ export class NexoAccountService {
       const sub = pickSubscription(subs)
       if (!sub) throw new Error('NO_SUBSCRIPTION')
       const downloaded = await client.downloadSubscription(client.subscriptionUrl(sub, subToken))
-      await this.deps.applyProfile(downloaded.content)
+      // 会话可能已在下载期间被退出登录：不能再把订阅写回去
+      if (this.session !== session) return
+      await this.deps.applyProfile(downloaded.content, {
+        name: sub.name || 'NEXO',
+        userInfo: downloaded.userInfo
+      })
       const account = buildAccountInfo(profile, sub, subs, downloaded.userInfo, this.now())
-      // 会话可能已在同步期间被退出登录
       if (this.session !== session) return
       session.account = account
       await this.deps.saveSession(session)

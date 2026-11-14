@@ -21,6 +21,7 @@ import { createTray } from './resolve/tray'
 import { init, initBasic, safeShowErrorBox, startSubStoreServices } from './utils/init'
 import { initShortcut } from './resolve/shortcut'
 import { initProfileUpdater } from './core/profileUpdater'
+import { initNexoAccount, syncNexoAccountInBackground } from './nexo/account'
 import { startMonitor } from './resolve/trafficMonitor'
 import { showFloatingWindow } from './resolve/floatingWindow'
 import { logger, createLogger } from './utils/logger'
@@ -349,10 +350,13 @@ app
       }
 
       try {
+        // 先恢复 NEXO 登录状态：未登录时清掉残留订阅，内核不会加载它
+        await initNexoAccount()
         initCoreWatcher()
         const startPromises = await startCoreForStartup()
         if (startPromises.length > 0) {
           startPromises[0].then(async () => {
+            syncNexoAccountInBackground()
             await Promise.allSettled([
               initProfileUpdater().catch((e) =>
                 mainLogger.warn('Failed to init profile updater', e)

@@ -620,6 +620,7 @@ interface IProfileItem {
   ageSecretKey?: string
   updateTimeout?: number
   pluginId?: string
+  nexo?: boolean // NEXO 账户订阅：内容加密存储，不允许查看或编辑
 }
 
 interface ISubStoreSub {

@@ -26,6 +26,7 @@ import {
 } from '../utils/dirs'
 import { createLogger } from '../utils/logger'
 import { atomicWriteFile } from '../utils/safeFile'
+import { decryptText, encryptText, isEncryptedBlob } from '../nexo/secretStore'
 import { isHttpUrl } from '../utils/url'
 import type { LocalSubscriptionOptions } from '../../shared/local-config'
 import {
@@ -909,7 +910,9 @@ export async function validateProfileCandidate(
 
 export async function getProfileStr(id: string | undefined): Promise<string> {
   if (existsSync(profilePath(id || 'default'))) {
-    return await readFile(profilePath(id || 'default'), 'utf-8')
+    const raw = await readFile(profilePath(id || 'default'))
+    // NEXO 账户订阅以本机加密形式落盘，只在主进程内解密
+    return isEncryptedBlob(raw) ? decryptText(raw) : raw.toString('utf-8')
   } else {
     return stringify(defaultProfile)
   }
@@ -950,6 +953,59 @@ export async function setProfileStr(id: string, content: string): Promise<void> 
   }
   await atomicWriteFile(profilePath(id), content, { encoding: 'utf8' })
   if (current === id) await reloadCurrentProfile()
+}
+
+export const NEXO_PROFILE_ID = 'nexo'
+
+export function isNexoProfileId(id: string | undefined): boolean {
+  return id === NEXO_PROFILE_ID
+}
+
+// NEXO 账户订阅：校验通过后加密写入 profiles/nexo.yaml，并设为当前订阅（已是当前则热加载）。
+export async function upsertNexoProfile(
+  content: string,
+  meta: { name: string; extra?: ISubscriptionUserInfo }
+): Promise<void> {
+  const snapshot = await getProfileItem(NEXO_PROFILE_ID)
+  const item: IProfileItem = {
+    ...snapshot,
+    id: NEXO_PROFILE_ID,
+    type: 'local',
+    name: meta.name,
+    nexo: true,
+    extra: meta.extra,
+    updated: Date.now()
+  }
+  await validateProfileCandidate(item, content)
+  const encrypted = encryptText(content)
+  let wasCurrent = false
+  await updateProfileConfig(async (config) => {
+    await atomicWriteFile(profilePath(NEXO_PROFILE_ID), encrypted)
+    const idx = config.items.findIndex((i) => i.id === NEXO_PROFILE_ID)
+    if (idx === -1) config.items.push(item)
+    else config.items[idx] = { ...config.items[idx], ...item }
+    wasCurrent = config.current === NEXO_PROFILE_ID
+    return config
+  })
+  if (wasCurrent) await reloadCurrentProfile()
+  else await changeCurrentProfile(NEXO_PROFILE_ID)
+}
+
+export async function removeNexoProfile(): Promise<void> {
+  const item = (await getProfileConfig()).items.find((i) => i.id === NEXO_PROFILE_ID)
+  if (item) await removeProfileItem(NEXO_PROFILE_ID)
+  else if (existsSync(profilePath(NEXO_PROFILE_ID))) await rm(profilePath(NEXO_PROFILE_ID))
+}
+
+// 启动时（内核尚未运行）清掉 NEXO 订阅：只改记录与文件，不重启内核
+export async function purgeNexoProfileOffline(): Promise<void> {
+  await updateProfileConfig((config) => {
+    config.items = config.items.filter((i) => i.id !== NEXO_PROFILE_ID)
+    if (config.current === NEXO_PROFILE_ID) config.current = config.items[0]?.id
+    return config
+  })
+  await rm(profilePath(NEXO_PROFILE_ID), { force: true })
+  await removeProfileWorkDir(NEXO_PROFILE_ID)
 }
 
 // 当前订阅的内容已替换：热加载，失败则回退到重启核心
