@@ -253,12 +253,19 @@ describe('optional account details', () => {
         ],
         '/user/traffic/live': [
           200,
-          { ips: [{ ip: '1.2.3.4', region: 'TW' }, { ip: '1.2.3.4' }, { ip: '5.6.7.8' }, {}] }
+          {
+            ips: [
+              { ip: '1.2.3.4', region: 'TW', conns: 10 },
+              { ip: '5.6.7.8', conns: 6 },
+              { ip: '9.9.9.9' },
+              {}
+            ]
+          }
         ]
       }
     })
     expect(account?.resetDay).toBe(15)
-    expect(account?.onlineIps).toEqual(['1.2.3.4', '5.6.7.8'])
+    expect(account?.online).toEqual({ ips: 3, conns: 16 })
   })
 
   it('falls back to the second candidate path and the wrapped response shape', async () => {
@@ -269,7 +276,7 @@ describe('optional account details', () => {
       }
     })
     expect(account?.resetDay).toBe(9)
-    expect(account?.onlineIps).toEqual([])
+    expect(account?.online).toEqual({ ips: 0, conns: 0 })
     master.calls.length = 0
     await service.sync()
     // 已知命中的路径：之后不再试第一个候选
@@ -280,7 +287,7 @@ describe('optional account details', () => {
   it('stops probing once no candidate exists', async () => {
     const { account, master, service } = await login({})
     expect(account?.resetDay).toBeUndefined()
-    expect(account?.onlineIps).toBeUndefined()
+    expect(account?.online).toBeUndefined()
     master.calls.length = 0
     await service.sync()
     expect(

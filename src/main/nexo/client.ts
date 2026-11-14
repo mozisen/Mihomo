@@ -67,6 +67,7 @@ export interface MasterOnlineIp {
   ip: string
   region?: string
   isp?: string
+  conns?: number
 }
 
 /**

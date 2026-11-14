@@ -201,19 +201,23 @@ export class NexoAccountService {
   private async fetchExtras(
     token: string,
     sub: MasterSubscription
-  ): Promise<Pick<NexoAccountInfo, 'resetDay' | 'onlineIps'>> {
+  ): Promise<Pick<NexoAccountInfo, 'resetDay' | 'online'>> {
     const { client, log } = this.deps
     const [assignments, ips] = await Promise.allSettled([
       client.packageAssignments(token),
       client.onlineIps(token)
     ])
-    const out: Pick<NexoAccountInfo, 'resetDay' | 'onlineIps'> = {}
+    const out: Pick<NexoAccountInfo, 'resetDay' | 'online'> = {}
     if (assignments.status === 'fulfilled' && assignments.value) {
       const day = pickResetDay(assignments.value, sub)
       if (day) out.resetDay = day
     }
     if (ips.status === 'fulfilled' && ips.value) {
-      out.onlineIps = [...new Set(ips.value.map((x) => x.ip))]
+      const conns = ips.value.reduce(
+        (n, x) => n + (Number.isFinite(x.conns) ? Math.max(0, Number(x.conns)) : 0),
+        0
+      )
+      out.online = { ips: new Set(ips.value.map((x) => x.ip)).size, conns }
     }
     for (const [name, r] of [
       ['packageAssignments', assignments],

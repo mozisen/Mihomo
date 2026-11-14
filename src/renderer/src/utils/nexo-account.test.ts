@@ -42,10 +42,10 @@ describe('buildAccountView', () => {
 
   it('formats online IPs and the next reset date', () => {
     const view = buildAccountView(
-      { username: 'a', resetDay: 15, onlineIps: ['1.1.1.1', '2.2.2.2'] },
+      { username: 'a', resetDay: 15, online: { ips: 1, conns: 16 } },
       new Date(2026, 10, 14)
     )
-    expect(view.onlineIps).toBe('1.1.1.1, 2.2.2.2')
+    expect(view.online).toEqual({ ips: 1, conns: 16 })
     expect(view.reset).toBe('2026-11-15')
   })
 })

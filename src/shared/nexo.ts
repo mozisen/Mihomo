@@ -10,8 +10,8 @@ export interface NexoAccountInfo {
   expire?: number
   /** 每月流量重置日（1–31）；主控暂未提供时为空 */
   resetDay?: number
-  /** 当前在线 IP；主控暂未提供时为空 */
-  onlineIps?: string[]
+  /** 当前在线的来源 IP 数与连接数；主控暂未提供时为空 */
+  online?: { ips: number; conns: number }
   lastSync?: number
 }
 

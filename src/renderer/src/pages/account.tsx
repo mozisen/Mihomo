@@ -141,7 +141,18 @@ export const AccountDetails: React.FC<{
           <Divider />
           <InfoRow testId="info-reset" label={t('account.info.resetDate')} value={view.reset} />
           <Divider />
-          <InfoRow testId="info-ip" label={t('account.info.onlineIp')} value={view.onlineIps} />
+          <InfoRow
+            testId="info-ip"
+            label={t('account.info.online')}
+            value={
+              view.online
+                ? t('account.info.onlineValue', {
+                    ips: view.online.ips,
+                    conns: view.online.conns
+                  })
+                : undefined
+            }
+          />
           <Divider />
           <InfoRow
             testId="info-sync"

@@ -13,7 +13,8 @@ export interface NexoAccountView {
   expire?: string
   /** 下次重置日期 YYYY-MM-DD */
   reset?: string
-  onlineIps?: string
+  /** 在线来源 IP 数与连接数 */
+  online?: { ips: number; conns: number }
 }
 
 function pad(n: number): string {
@@ -53,6 +54,6 @@ export function buildAccountView(account: NexoAccountInfo, now = new Date()): Ne
   if (account.resetDay && account.resetDay >= 1 && account.resetDay <= 31) {
     view.reset = ymd(nextResetDate(account.resetDay, now))
   }
-  if (account.onlineIps?.length) view.onlineIps = account.onlineIps.join(', ')
+  if (account.online) view.online = { ...account.online }
   return view
 }
