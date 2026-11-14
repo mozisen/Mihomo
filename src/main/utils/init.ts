@@ -43,7 +43,6 @@ import {
   profilesDir,
   resourcesFilesDir,
   rulesDir,
-  themesDir,
   localConfigPath
 } from './dirs'
 import { initLogger } from './logger'
@@ -104,7 +103,6 @@ async function initDirs(): Promise<void> {
 
   const dirsToCreate = [
     dataDir(),
-    themesDir(),
     profilesDir(),
     overrideDir(),
     rulesDir(),

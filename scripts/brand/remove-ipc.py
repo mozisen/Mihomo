@@ -40,7 +40,7 @@ def main(names: list[str]) -> None:
     renderer = ROOT / 'renderer' / 'src' / 'utils' / 'ipc.ts'
     m, p, r = (f.read_text('utf-8') for f in (main_ipc, preload, renderer))
     for n in names:
-        m = re.sub(rf'\n  {re.escape(n)}(: [^\n]*)?,(?=\n)', '', m)
+        m = re.sub(rf'\n  {re.escape(n)}(: [^\n]*)?,?(?=\n)', '', m)
         p = re.sub(rf"\n  '{re.escape(n)}',(?=\n)", '', p)
         r = drop_member(r, n)
         r = re.sub(rf'\n  {re.escape(n)},(?=\n)', '', r)

@@ -134,13 +134,6 @@ const validInvokeChannels = [
   'fetchMihomoTags',
   'installSpecificMihomoCore',
   'clearMihomoVersionCache',
-  // Theme
-  'resolveThemes',
-  'fetchThemes',
-  'importThemes',
-  'readTheme',
-  'writeTheme',
-  'applyTheme',
   // Tray
   'showTrayIcon',
   'closeTrayIcon',

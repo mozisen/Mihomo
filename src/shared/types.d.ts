@@ -349,7 +349,6 @@ interface IAppConfig {
   lockSiderCards?: boolean
   siderWidth: number
   appTheme: AppTheme
-  customTheme?: string
   autoCheckUpdate: boolean
   autoUpdateProfileOnStart: boolean
   silentUpdate: boolean

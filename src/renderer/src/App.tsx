@@ -7,7 +7,7 @@ import { IoSettings } from 'react-icons/io5'
 import routes, { useDeferredRoutePreload } from '@renderer/routes'
 import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { applyTheme, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
+import { setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
 import { platform } from '@renderer/utils/init'
 import { TitleBarOverlayOptions } from 'electron'
 import { useTrafficLogger } from '@renderer/hooks/use-traffic-logger'
@@ -52,7 +52,6 @@ const App: React.FC = () => {
   const {
     enableTrafficLogger = DEFAULT_ENABLE_TRAFFIC_LOGGER,
     appTheme = 'system',
-    customTheme,
     useWindowFrame = false,
     siderWidth = 250,
     disableAnimations = false,
@@ -164,12 +163,6 @@ const App: React.FC = () => {
     setTheme(appTheme)
     setTitlebar()
   }, [appTheme, systemTheme, setTheme, setTitlebar])
-
-  useEffect(() => {
-    applyTheme(customTheme || 'default.css').then(() => {
-      setTitlebar()
-    })
-  }, [customTheme, setTitlebar])
 
   useEffect(() => {
     window.addEventListener('mouseup', onResizeEnd)

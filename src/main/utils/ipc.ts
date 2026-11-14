@@ -110,14 +110,6 @@ import {
 } from '../resolve/tray'
 import { registerShortcut } from '../resolve/shortcut'
 import { closeMainWindow, mainWindow, showMainWindow, triggerMainWindow } from '../window'
-import {
-  applyTheme,
-  fetchThemes,
-  importThemes,
-  readTheme,
-  resolveThemes,
-  writeTheme
-} from '../resolve/theme'
 import { startMonitor } from '../resolve/trafficMonitor'
 import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
 import { addProfileUpdater, removeProfileUpdater } from '../core/profileUpdater'
@@ -378,13 +370,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   fetchMihomoTags,
   installSpecificMihomoCore,
   clearMihomoVersionCache,
-  // Theme
-  resolveThemes,
-  fetchThemes,
-  importThemes,
-  readTheme,
-  writeTheme,
-  applyTheme,
   // Tray
   showTrayIcon,
   closeTrayIcon,

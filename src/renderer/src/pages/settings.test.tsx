@@ -20,7 +20,6 @@ vi.mock('@renderer/components/settings/general-config', () => ({ default: () => 
 vi.mock('@renderer/components/settings/mihomo-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/actions', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/shortcut-config', () => ({ default: () => null }))
-vi.mock('@renderer/components/settings/sider-config', () => ({ default: () => null }))
 
 describe('Settings page', () => {
   it('has no docs, GitHub or Telegram link buttons in the header', () => {
