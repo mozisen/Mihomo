@@ -52,3 +52,24 @@ describe('auto update', () => {
     )
   })
 })
+
+describe('slim bundle', () => {
+  it('does not download the removed resources at build time', () => {
+    const prepare = readText('scripts', 'prepare.mjs')
+    for (const file of ['ASN.mmdb', 'BundleMRS.7z', 'geoip.metadb', '7za.exe', 'sub-store']) {
+      expect(prepare, file).not.toContain(file)
+    }
+  })
+
+  it('does not register the .cpx plugin file type', () => {
+    expect(parse(readText('electron-builder.yml')).fileAssociations).toBeUndefined()
+  })
+
+  it('does not bundle the Monaco editor', () => {
+    const pkg = JSON.parse(readText('package.json'))
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+    for (const name of ['react-monaco-editor', 'monaco-yaml', 'vite-plugin-monaco-editor']) {
+      expect(deps[name], name).toBeUndefined()
+    }
+  })
+})

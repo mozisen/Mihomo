@@ -307,11 +307,6 @@ const resolveMmdb = () =>
     file: 'country.mmdb',
     downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb`
   })
-const resolveMetadb = () =>
-  resolveResource({
-    file: 'geoip.metadb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb`
-  })
 const resolveGeosite = () =>
   resolveResource({
     file: 'geosite.dat',
@@ -321,16 +316,6 @@ const resolveGeoIP = () =>
   resolveResource({
     file: 'geoip.dat',
     downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat`
-  })
-const resolveASN = () =>
-  resolveResource({
-    file: 'ASN.mmdb',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`
-  })
-const resolveBundleMRS = () =>
-  resolveResource({
-    file: 'BundleMRS.7z',
-    downloadURL: `https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/BundleMRS.7z`
   })
 const resolveEnableLoopback = () =>
   resolveResource({
@@ -492,11 +477,8 @@ const tasks = [
     retry: 5
   },
   { name: 'mmdb', func: resolveMmdb, retry: 5 },
-  { name: 'metadb', func: resolveMetadb, retry: 5 },
   { name: 'geosite', func: resolveGeosite, retry: 5 },
   { name: 'geoip', func: resolveGeoIP, retry: 5 },
-  { name: 'asn', func: resolveASN, retry: 5 },
-  { name: 'bundlemrs', func: resolveBundleMRS, retry: 5 },
   {
     name: 'font',
     func: resolveFont,

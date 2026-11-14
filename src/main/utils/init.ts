@@ -228,13 +228,10 @@ async function initFiles(): Promise<void> {
     )
   }
 
+  // NEXO 只内置 country.mmdb / geoip.dat / geosite.dat；ASN、metadb 等由内核按需下载。
   const files = [
     {
       name: 'country.mmdb',
-      targetDirs: [mihomoWorkDir(), mihomoTestDir()]
-    },
-    {
-      name: 'geoip.metadb',
       targetDirs: [mihomoWorkDir(), mihomoTestDir()]
     },
     {
@@ -243,14 +240,6 @@ async function initFiles(): Promise<void> {
     },
     {
       name: 'geosite.dat',
-      targetDirs: [mihomoWorkDir(), mihomoTestDir()]
-    },
-    {
-      name: 'ASN.mmdb',
-      targetDirs: [mihomoWorkDir(), mihomoTestDir()]
-    },
-    {
-      name: 'BundleMRS.7z',
       targetDirs: [mihomoWorkDir(), mihomoTestDir()]
     }
   ]
