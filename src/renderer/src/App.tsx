@@ -5,7 +5,6 @@ import OutboundModeSwitcher from '@renderer/components/sider/outbound-mode-switc
 import { Button, Divider } from '@heroui/react'
 import { IoSettings } from 'react-icons/io5'
 import routes, { useDeferredRoutePreload } from '@renderer/routes'
-import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
 import { platform } from '@renderer/utils/init'
@@ -13,7 +12,6 @@ import { TitleBarOverlayOptions } from 'electron'
 import { useTrafficLogger } from '@renderer/hooks/use-traffic-logger'
 import { useDnsOverrideAutoDisabledNotice } from '@renderer/hooks/use-dns-override-notice'
 import { createTourDriver, getDriver, startTourIfNeeded } from '@renderer/utils/tour'
-import { hasPendingPluginFile, subscribePluginFile } from '@renderer/utils/plugin-file-open'
 import 'driver.js/dist/driver.css'
 import { useTranslation } from 'react-i18next'
 import { DEFAULT_ENABLE_TRAFFIC_LOGGER } from '../../shared/appConfig'
@@ -93,15 +91,6 @@ const App: React.FC = () => {
   const navigate: NavigateFunction = useNavigate()
   const location = useLocation()
   const page = useRoutes(routes)
-
-  useEffect(() => {
-    const openPluginImport = (): void => {
-      navigate('/profiles')
-    }
-    const unsubscribe = subscribePluginFile(openPluginImport)
-    if (hasPendingPluginFile()) openPluginImport()
-    return unsubscribe
-  }, [navigate])
 
   const setTitlebar = useCallback((): void => {
     if (!useWindowFrame && platform !== 'darwin') {
@@ -233,9 +222,6 @@ const App: React.FC = () => {
               <SiderCards iconOnly expanded={siderExpandedOnHover} />
             </Suspense>
             <div className="pt-2 pb-4 flex shrink-0 flex-col space-y-2">
-              <div className="flex justify-center">
-                <UpdaterButton iconOnly />
-              </div>
               <div className="px-2 flex justify-center">
                 <OutboundModeSwitcher iconOnly expanded={siderExpandedOnHover} />
               </div>
@@ -261,7 +247,6 @@ const App: React.FC = () => {
                   <NexoLogo className="h-8 w-8 mr-1" />
                   <h3 className="text-lg font-bold leading-8">NEXO</h3>
                 </div>
-                <UpdaterButton />
                 <Button
                   size="sm"
                   className="app-nodrag"

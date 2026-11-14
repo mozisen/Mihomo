@@ -1,5 +1,3 @@
-import path from 'path'
-import v8 from 'v8'
 import { readFile } from 'fs/promises'
 import { app, ipcMain } from 'electron'
 import i18next from 'i18next'
@@ -71,7 +69,6 @@ import {
   showErrorDialog
 } from '../core/manager'
 import { triggerSysProxy } from '../sys/sysproxy'
-import { checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
 import {
   getFilePath,
   openFile,
@@ -114,15 +111,6 @@ import { startMonitor } from '../resolve/trafficMonitor'
 import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
 import { addProfileUpdater, removeProfileUpdater } from '../core/profileUpdater'
 import {
-  previewPlugin,
-  installPlugin,
-  loginPlugin,
-  removePlugin,
-  updatePluginProfile,
-  patchPluginItem
-} from '../resolve/plugin'
-import { getPluginConfig } from '../config/plugin'
-import {
   clearTrafficUsage,
   importTrafficUsage,
   queryTrafficUsageBreakdown,
@@ -152,7 +140,7 @@ import {
 import { getImageDataURL } from './image'
 import { get as httpGet } from './chromeRequest'
 import { getAppInfo } from './app-info'
-import { logDir, rulePath } from './dirs'
+import { rulePath } from './dirs'
 import { installMihomoCore, getGitHubTags, clearVersionCache } from './github'
 import { atomicWriteFile } from './safeFile'
 
@@ -365,8 +353,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   setupFirewall,
   copyEnv,
   // Update
-  checkUpdate,
-  downloadAndInstallUpdate,
   fetchMihomoTags,
   installSpecificMihomoCore,
   clearMihomoVersionCache,
@@ -379,14 +365,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   showFloatingWindow,
   closeFloatingWindow,
   showContextMenu,
-  // Plugin
-  getPluginConfig,
-  previewPlugin,
-  installPlugin,
-  loginPlugin,
-  removePlugin,
-  updatePluginProfile,
-  patchPluginItem,
   // Misc
   fetchIPInfo,
   measureLatency,
@@ -416,7 +394,6 @@ const syncHandlers: Record<string, SyncFn> = {
   setAlwaysOnTop: (alwaysOnTop: boolean) => mainWindow?.setAlwaysOnTop(alwaysOnTop),
   isAlwaysOnTop: () => mainWindow?.isAlwaysOnTop(),
   openDevTools: () => mainWindow?.webContents.openDevTools(),
-  createHeapSnapshot: () => v8.writeHeapSnapshot(path.join(logDir(), `${Date.now()}.heapsnapshot`)),
   relaunchApp: () => {
     app.relaunch()
     app.quit()

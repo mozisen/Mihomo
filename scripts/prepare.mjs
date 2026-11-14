@@ -456,11 +456,6 @@ const resolveMonitor = async () => {
   console.log(`[INFO]: TrafficMonitor finished`)
 }
 
-const resolve7zip = () =>
-  resolveResource({
-    file: '7za.exe',
-    downloadURL: `https://github.com/develar/7zip-bin/raw/master/win/${arch}/7za.exe`
-  })
 const resolveHelper = () =>
   resolveResource({
     file: 'party.mihomo.helper',
@@ -521,12 +516,6 @@ const tasks = [
   {
     name: 'monitor',
     func: resolveMonitor,
-    retry: 5,
-    winOnly: true
-  },
-  {
-    name: '7zip',
-    func: resolve7zip,
     retry: 5,
     winOnly: true
   },

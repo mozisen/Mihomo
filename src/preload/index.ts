@@ -127,8 +127,6 @@ const validInvokeChannels = [
   'setNativeTheme',
   'copyEnv',
   // Update
-  'checkUpdate',
-  'downloadAndInstallUpdate',
   'getVersion',
   'platform',
   'fetchMihomoTags',
@@ -151,19 +149,10 @@ const validInvokeChannels = [
   'setAlwaysOnTop',
   'isAlwaysOnTop',
   'openDevTools',
-  'createHeapSnapshot',
   'relaunchApp',
   'quitApp',
   // Shortcut
   'registerShortcut',
-  // Plugin
-  'getPluginConfig',
-  'previewPlugin',
-  'installPlugin',
-  'loginPlugin',
-  'removePlugin',
-  'updatePluginProfile',
-  'patchPluginItem',
   // Misc
   'fetchIPInfo',
   'measureLatency',
@@ -188,10 +177,7 @@ const validListenChannels = [
   'proxyProvidersUpdated',
   'ruleProvidersUpdated',
   'core-started',
-  'updateDownloadProgress',
-  'pluginConfigUpdated',
   'nexoAccountChanged',
-  'openPluginFile',
   'dnsOverrideAutoDisabled'
 ] as const
 

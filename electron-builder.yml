@@ -25,12 +25,6 @@ protocols:
   schemes:
     - 'clash'
     - 'mihomo'
-fileAssociations:
-  - ext: 'cpx'
-    name: 'NEXO Plugin'
-    description: 'NEXO airport plugin descriptor'
-    mimeType: 'application/x-clash-party-plugin'
-    role: 'Viewer'
 win:
   target:
     - nsis

@@ -197,8 +197,6 @@ interface IpcApi {
   setNativeTheme: (theme: 'system' | 'light' | 'dark') => Promise<void>
   copyEnv: (type: 'bash' | 'cmd' | 'powershell' | 'fish' | 'nushell') => Promise<void>
   // Update
-  checkUpdate: () => Promise<IAppVersion | undefined>
-  downloadAndInstallUpdate: (version: string) => Promise<void>
   getVersion: () => Promise<string>
   platform: () => Promise<NodeJS.Platform>
   fetchMihomoTags: (
@@ -221,17 +219,8 @@ interface IpcApi {
   setAlwaysOnTop: (alwaysOnTop: boolean) => Promise<void>
   isAlwaysOnTop: () => Promise<boolean>
   openDevTools: () => Promise<void>
-  createHeapSnapshot: () => Promise<void>
   // Shortcut
   registerShortcut: (oldShortcut: string, newShortcut: string, action: string) => Promise<boolean>
-  // Plugin
-  getPluginConfig: (force?: boolean) => Promise<IPluginConfig>
-  previewPlugin: (fileBytesB64: string) => Promise<IPluginDescriptorPreview>
-  installPlugin: (fileBytesB64: string) => Promise<IPluginItem>
-  loginPlugin: (id: string) => Promise<void>
-  removePlugin: (id: string) => Promise<void>
-  updatePluginProfile: (id: string, force?: boolean) => Promise<void>
-  patchPluginItem: (id: string, patch: Partial<IPluginItem>) => Promise<void>
   // Misc
   fetchIPInfo: (url: string) => Promise<unknown>
   measureLatency: (url: string) => Promise<number | null>
@@ -375,8 +364,6 @@ export const {
   setNativeTheme,
   copyEnv,
   // Update
-  checkUpdate,
-  downloadAndInstallUpdate,
   getVersion,
   fetchMihomoTags,
   installSpecificMihomoCore,
@@ -396,17 +383,8 @@ export const {
   setAlwaysOnTop,
   isAlwaysOnTop,
   openDevTools,
-  createHeapSnapshot,
   // Shortcut
   registerShortcut,
-  // Plugin
-  getPluginConfig,
-  previewPlugin,
-  installPlugin,
-  loginPlugin,
-  removePlugin,
-  updatePluginProfile,
-  patchPluginItem,
   // Misc
   fetchIPInfo,
   measureLatency,

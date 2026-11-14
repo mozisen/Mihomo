@@ -1,31 +1,7 @@
-import { readFileSync, readdirSync } from 'fs'
+import { existsSync, readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { parse } from 'yaml'
-
-const mocks = vi.hoisted(() => ({
-  get: vi.fn()
-}))
-
-vi.mock('electron', () => ({
-  app: { getVersion: () => '1.0.0', getPath: () => '/tmp' },
-  shell: {}
-}))
-vi.mock('./window', () => ({ mainWindow: null }))
-vi.mock('./utils/logger', () => ({ appLogger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }))
-vi.mock('./utils/dirs', () => ({
-  dataDir: () => '/tmp',
-  exeDir: () => '/tmp',
-  exePath: () => '/tmp/NEXO',
-  isPortable: () => false,
-  resourcesFilesDir: () => '/tmp'
-}))
-vi.mock('./config', () => ({
-  getAppConfig: async () => ({}),
-  getControledMihomoConfig: async () => ({})
-}))
-vi.mock('./core/manager', () => ({ checkAdminPrivileges: vi.fn() }))
-vi.mock('./utils/chromeRequest', () => ({ get: mocks.get }))
 
 const root = join(__dirname, '..', '..')
 const readText = (...p: string[]): string => readFileSync(join(root, ...p), 'utf-8')
@@ -69,10 +45,10 @@ describe('NEXO branding', () => {
 })
 
 describe('auto update', () => {
-  it('never checks the upstream release feed', async () => {
-    const { checkUpdate, APP_UPDATE_ENABLED } = await import('./resolve/autoUpdater')
-    expect(APP_UPDATE_ENABLED).toBe(false)
-    await expect(checkUpdate()).resolves.toBeUndefined()
-    expect(mocks.get).not.toHaveBeenCalled()
+  it('ships without an updater that could pull upstream releases', () => {
+    expect(existsSync(join(root, 'src', 'main', 'resolve', 'autoUpdater.ts'))).toBe(false)
+    expect(readText('src', 'preload', 'index.ts')).not.toMatch(
+      /checkUpdate|downloadAndInstallUpdate/
+    )
   })
 })

@@ -39,22 +39,9 @@ async function updateProfile(id: string): Promise<void> {
       // 动态 import 避免与 window.ts 形成静态循环依赖
       const { mainWindow } = await import('../window')
       mainWindow?.webContents.send('profileConfigUpdated')
-    } else if (item?.pluginId) {
-      const { updatePluginProfile } = await import('../resolve/plugin')
-      await updatePluginProfile(item.pluginId)
     }
   } finally {
     updatingProfileIds.delete(id)
-  }
-}
-
-async function auditPluginProfileVault(item: IProfileItem): Promise<void> {
-  if (!item.pluginId) return
-  try {
-    const { auditPluginVault } = await import('../resolve/plugin')
-    await auditPluginVault(item.pluginId)
-  } catch (e) {
-    await logger.warn(`[ProfileUpdater] Failed to audit plugin vault ${item.pluginId}:`, e)
   }
 }
 
@@ -69,7 +56,7 @@ function updateTask(itemId: string, logLabel: string): () => Promise<void> {
 }
 
 function scheduleProfileUpdate(item: IProfileItem): void {
-  if ((!item.pluginId && item.type !== 'remote') || !item.autoUpdate || !item.interval) return
+  if (item.type !== 'remote' || !item.autoUpdate || !item.interval) return
 
   const itemId = item.id
   const logLabel = `profile ${itemId}`
@@ -116,8 +103,6 @@ export async function initProfileUpdater(): Promise<void> {
   const currentItem = await getCurrentProfileItem()
 
   for (const item of items.filter((i) => i.id !== current)) {
-    await auditPluginProfileVault(item)
-
     if (item.type === 'remote' && item.autoUpdate && item.interval) {
       await addProfileUpdater(item)
 
@@ -129,13 +114,7 @@ export async function initProfileUpdater(): Promise<void> {
         }
       }
     }
-
-    if (item.pluginId && item.autoUpdate && item.interval) {
-      await addProfileUpdater(item)
-    }
   }
-
-  await auditPluginProfileVault(currentItem)
 
   if (currentItem?.type === 'remote' && currentItem.autoUpdate && currentItem.interval) {
     const currentId = currentItem.id
@@ -151,15 +130,6 @@ export async function initProfileUpdater(): Promise<void> {
 
     const latestCurrentItem = (await getProfileItem(currentId)) ?? currentItem
     scheduleDelayedCurrentUpdate(latestCurrentItem)
-  }
-
-  if (
-    currentItem?.pluginId &&
-    currentItem.autoUpdate &&
-    currentItem.interval &&
-    currentItem.id !== 'default'
-  ) {
-    await addProfileUpdater(currentItem)
   }
 }
 

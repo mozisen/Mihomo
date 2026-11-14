@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
-  auditPluginVault: vi.fn(),
-  updatePluginProfile: vi.fn(),
   getAppConfig: vi.fn(),
   getProfileConfig: vi.fn(),
   getCurrentProfileItem: vi.fn(),
@@ -17,11 +15,6 @@ vi.mock('../config', () => ({
   addProfileItem: mocks.addProfileItem
 }))
 
-vi.mock('../resolve/plugin', () => ({
-  auditPluginVault: mocks.auditPluginVault,
-  updatePluginProfile: mocks.updatePluginProfile
-}))
-
 vi.mock('../utils/logger', () => ({
   logger: { warn: vi.fn() }
 }))
@@ -34,10 +27,9 @@ describe('initProfileUpdater', () => {
       current: 'default',
       items: [
         {
-          id: 'profile-plugin',
+          id: 'profile-local',
           type: 'local',
           name: 'Demo',
-          pluginId: 'plugin-id',
           autoUpdate: false,
           interval: 0
         }
@@ -51,12 +43,11 @@ describe('initProfileUpdater', () => {
     mocks.getProfileItem.mockResolvedValue(undefined)
   })
 
-  it('audits plugin vault availability on startup even when auto update is disabled', async () => {
+  it('does not fetch local profiles on startup', async () => {
     const { initProfileUpdater } = await import('./profileUpdater')
     await initProfileUpdater()
 
-    expect(mocks.auditPluginVault).toHaveBeenCalledWith('plugin-id')
-    expect(mocks.updatePluginProfile).not.toHaveBeenCalled()
+    expect(mocks.addProfileItem).not.toHaveBeenCalled()
   })
 
   it('skips remote profile updates on startup when disabled', async () => {
