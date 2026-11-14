@@ -1,19 +1,15 @@
-import { Button, Card, CardBody, Chip, Switch } from '@heroui/react'
-import { MdEdit } from 'react-icons/md'
+import { Card, CardBody, Chip, Switch } from '@heroui/react'
 import React, { useState, useEffect } from 'react'
 import { mihomoRulesDisable } from '@renderer/utils/ipc'
 import { useTranslation } from 'react-i18next'
-import DeleteResourceButton from '../local/delete-resource-button'
 
 interface RuleItemProps extends IMihomoRulesDetail {
   index: number
-  onEdit?: () => void
-  onDelete?: () => Promise<void>
 }
 
 const RuleItem: React.FC<RuleItemProps> = (props) => {
   const { t } = useTranslation()
-  const { type, payload, proxy, index: listIndex, extra, onEdit, onDelete } = props
+  const { type, payload, proxy, index: listIndex, extra } = props
   const ruleIndex = props.index ?? listIndex
 
   const [isEnabled, setIsEnabled] = useState(!extra?.disabled)
@@ -45,13 +41,7 @@ const RuleItem: React.FC<RuleItemProps> = (props) => {
 
   return (
     <div className={`w-full px-2 pb-2 ${listIndex === 0 ? 'pt-2' : ''}`}>
-      <Card
-        as="div"
-        fullWidth
-        isPressable={!!onEdit}
-        onPress={onEdit}
-        className={!onEdit && !isEnabled ? 'opacity-50' : ''}
-      >
+      <Card as="div" fullWidth className={!isEnabled ? 'opacity-50' : ''}>
         <CardBody className="py-3 px-4">
           <div className="flex justify-between items-center gap-4">
             {/* 左侧：规则信息 */}
@@ -72,29 +62,7 @@ const RuleItem: React.FC<RuleItemProps> = (props) => {
               </div>
             </div>
 
-            {onEdit && (
-              <div
-                onPointerDown={(event) => event.stopPropagation()}
-                onKeyDown={(event) => event.stopPropagation()}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <Button
-                  size="sm"
-                  isIconOnly
-                  variant="light"
-                  title="编辑规则"
-                  aria-label={`编辑规则 ${listIndex + 1}`}
-                  onPress={onEdit}
-                >
-                  <MdEdit className="text-lg text-foreground-500" />
-                </Button>
-              </div>
-            )}
-            {onDelete && (
-              <DeleteResourceButton label={`规则 ${listIndex + 1}`} onDelete={onDelete} />
-            )}
-            {!onEdit &&
-              extra &&
+            {extra &&
               (() => {
                 const total = extra.hitCount + extra.missCount
                 const rate = total > 0 ? (extra.hitCount / total) * 100 : 0

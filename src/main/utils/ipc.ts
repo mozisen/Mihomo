@@ -1,4 +1,3 @@
-import { readFile } from 'fs/promises'
 import { app, ipcMain } from 'electron'
 import i18next from 'i18next'
 import {
@@ -37,20 +36,14 @@ import {
   addProfileItem,
   removeProfileItem,
   changeCurrentProfile,
-  getProfileStr,
-  getProfileImportInfo,
   getFileStr,
   setFileStr,
-  setProfileStr,
   updateProfileItem,
   setProfileConfig,
   getOverrideConfig,
   setOverrideConfig,
-  getOverrideItem,
   addOverrideItem,
   removeOverrideItem,
-  getOverride,
-  setOverride,
   updateOverrideItem,
   convertMrsRuleset
 } from '../config'
@@ -71,15 +64,13 @@ import {
 import { triggerSysProxy } from '../sys/sysproxy'
 import {
   getFilePath,
-  openFile,
   openUWPTool,
   readImageFileDataURL,
-  readTextFile,
   resetAppConfig,
   setNativeTheme,
   setupFirewall
 } from '../sys/misc'
-import { getRuntimeConfig, getRuntimeConfigStr } from '../core/factory'
+import { getRuntimeConfig } from '../core/factory'
 import {
   nexoCancel2fa,
   nexoGetAccountState,
@@ -116,33 +107,10 @@ import {
   queryTrafficUsageBreakdown,
   queryTrafficUsageOverview
 } from '../traffic/database'
-import {
-  getLocalConfig,
-  getLocalNode,
-  createLocalNodes,
-  saveLocalNode,
-  removeLocalNode,
-  getLocalProxyGroup,
-  getLocalRulesEditor,
-  saveLocalRules,
-  saveLocalRuleProvider,
-  createLocalProxyGroup,
-  saveLocalProxyGroup,
-  removeLocalProxyGroup,
-  reorderLocalProxyGroups,
-  saveLocalDraft,
-  previewLocalConfig,
-  publishLocalConfig,
-  exportLocalConfig,
-  refreshLocalSource,
-  removeLocalSource
-} from '../local/service'
 import { getImageDataURL } from './image'
 import { get as httpGet } from './chromeRequest'
 import { getAppInfo } from './app-info'
-import { rulePath } from './dirs'
 import { installMihomoCore, getGitHubTags, clearVersionCache } from './github'
-import { atomicWriteFile } from './safeFile'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AsyncFn = (...args: any[]) => Promise<any>
@@ -187,23 +155,6 @@ async function installSpecificMihomoCore(version: string): Promise<void> {
 
 async function clearMihomoVersionCache(): Promise<void> {
   clearVersionCache('MetaCubeX', 'mihomo')
-}
-
-async function getRuleStr(id: string): Promise<string> {
-  return await readFile(rulePath(id), 'utf-8')
-}
-
-async function setRuleStr(id: string, str: string): Promise<void> {
-  await atomicWriteFile(rulePath(id), str, { encoding: 'utf8' })
-}
-
-async function getSmartOverrideContent(): Promise<string | null> {
-  try {
-    const override = await getOverrideItem('smart-core-override')
-    return override?.file || null
-  } catch {
-    return null
-  }
 }
 
 async function fetchIPInfo(url: string): Promise<unknown> {
@@ -283,9 +234,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   setProfileConfig,
   getCurrentProfileItem,
   getProfileItem,
-  getProfileStr,
-  getProfileImportInfo,
-  setProfileStr,
   addProfileItem,
   removeProfileItem,
   updateProfileItem,
@@ -295,41 +243,14 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   // Override
   getOverrideConfig,
   setOverrideConfig,
-  getOverrideItem,
   addOverrideItem,
   removeOverrideItem,
   updateOverrideItem,
-  getOverride,
-  setOverride,
   // File
   getFileStr,
   setFileStr,
   convertMrsRuleset,
   getRuntimeConfig,
-  getRuntimeConfigStr,
-  getSmartOverrideContent,
-  getRuleStr,
-  setRuleStr,
-  getLocalConfig,
-  getLocalNode,
-  createLocalNodes,
-  saveLocalNode,
-  removeLocalNode,
-  getLocalProxyGroup,
-  getLocalRulesEditor,
-  saveLocalRules,
-  saveLocalRuleProvider,
-  createLocalProxyGroup,
-  saveLocalProxyGroup,
-  removeLocalProxyGroup,
-  reorderLocalProxyGroups,
-  saveLocalDraft,
-  previewLocalConfig,
-  publishLocalConfig,
-  exportLocalConfig,
-  refreshLocalSource,
-  removeLocalSource,
-  readTextFile,
   // Core
   restartCore,
   getSmartModelStatus,
@@ -382,7 +303,6 @@ const asyncHandlers = guardNexoHandlers(rawAsyncHandlers, nexoGuardContext)
 const syncHandlers: Record<string, SyncFn> = {
   resetAppConfig,
   getFilePath,
-  openFile,
   getInterfaces,
   setNativeTheme,
   getVersion: () => app.getVersion(),

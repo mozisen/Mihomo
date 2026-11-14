@@ -9,11 +9,8 @@ type SiderCardKey =
   | 'proxy'
   | 'rule'
   | 'resource'
-  | 'override'
   | 'connection'
   | 'mihomo'
-  | 'dns'
-  | 'sniff'
   | 'log'
   | 'network'
   | 'usage'
@@ -311,7 +308,6 @@ interface IAppConfig {
   floatingWindowCompatMode?: boolean
   disableHardwareAcceleration?: boolean
   connectionCardStatus?: CardStatus
-  dnsCardStatus?: CardStatus
   logCardStatus?: CardStatus
   hideConnectionCardWave?: boolean
   pauseSSID?: string[]
@@ -320,13 +316,11 @@ interface IAppConfig {
   ssidProfileMap?: Record<string, string>
   ssidProfileRestore?: boolean
   mihomoCoreCardStatus?: CardStatus
-  overrideCardStatus?: CardStatus
   profileCardStatus?: CardStatus
   proxyCardStatus?: CardStatus
   networkCardStatus?: CardStatus
   resourceCardStatus?: CardStatus
   ruleCardStatus?: CardStatus
-  sniffCardStatus?: CardStatus
   sysproxyCardStatus?: CardStatus
   tunCardStatus?: CardStatus
   usageCardStatus?: CardStatus

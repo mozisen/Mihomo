@@ -18,22 +18,35 @@ export function normalizeYamlMaxAliasCount(value: unknown): number {
   return value
 }
 
+// NEXO 固定顺序：外部资源排在最底部、用量的右侧。
 export const DEFAULT_SIDER_ORDER: SiderCardKey[] = [
   'sysproxy',
   'tun',
   'profile',
   'proxy',
   'rule',
-  'resource',
-  'override',
   'connection',
   'mihomo',
-  'dns',
-  'sniff',
   'log',
   'network',
-  'usage'
+  'usage',
+  'resource'
 ]
+
+// 侧边栏卡片的固定尺寸：用量与外部资源同为半宽，并排位于最底部。
+export const SIDER_CARD_DEFAULT_STATUS = {
+  sysproxyCardStatus: 'col-span-1',
+  tunCardStatus: 'col-span-1',
+  profileCardStatus: 'col-span-2',
+  proxyCardStatus: 'col-span-1',
+  ruleCardStatus: 'col-span-1',
+  connectionCardStatus: 'col-span-2',
+  mihomoCoreCardStatus: 'col-span-2',
+  logCardStatus: 'col-span-1',
+  networkCardStatus: 'col-span-1',
+  usageCardStatus: 'col-span-1',
+  resourceCardStatus: 'col-span-1'
+} as const satisfies Record<string, CardStatus>
 
 export const DEFAULT_NETWORK_INFO_CARD_ORDER: NetworkInfoCardKey[] = ['ip', 'topology', 'latency']
 

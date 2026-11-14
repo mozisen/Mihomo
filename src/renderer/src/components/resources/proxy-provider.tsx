@@ -14,21 +14,16 @@ import dayjs from '@renderer/utils/dayjs'
 import { calcTraffic } from '@renderer/utils/calc'
 import { getHash } from '@renderer/utils/hash'
 import { useTranslation } from 'react-i18next'
-import { useActiveProfile } from '@renderer/hooks/use-active-profile'
 import { useGroups } from '@renderer/hooks/use-groups'
 import { includesIgnoreCase } from '@renderer/utils/includes'
-import { FaPlus } from 'react-icons/fa6'
-import ProviderModal from '../local/provider-modal'
 import SettingItem from '../base/base-setting-item'
 import SettingCard from '../base/base-setting-card'
 import QrCodeModal from './qr-code-modal'
 import Viewer from './viewer'
-/* eslint-disable react/prop-types */
-const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }) => {
+
+const ProxyProvider: React.FC = () => {
   const { t } = useTranslation()
-  const { isLocalActive: localMode } = useActiveProfile()
   const { mutate: mutateGroups } = useGroups()
-  const editing = !!editingProp && localMode
   const [showDetails, setShowDetails] = useState({
     show: false,
     path: '',
@@ -37,14 +32,6 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
     privderType: ''
   })
   const [qrCode, setQrCode] = useState<{ name: string; url: string } | null>(null)
-  const [editorName, setEditorName] = useState<string | undefined>()
-  const [editorOpen, setEditorOpen] = useState(false)
-  useEffect(() => {
-    if (!editing) {
-      setEditorOpen(false)
-      setEditorName(undefined)
-    }
-  }, [editing])
   useEffect(() => {
     if (showDetails.title) {
       const fetchProviderPath = async (name: string): Promise<void> => {
@@ -113,7 +100,7 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
     mutateGroups()
   }
 
-  if (!providers.length && !localMode) {
+  if (!providers.length) {
     return null
   }
 
@@ -131,14 +118,6 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
 
   return (
     <SettingCard>
-      {editorOpen && (
-        <ProviderModal
-          kind="proxy-providers"
-          name={editorName}
-          onClose={() => setEditorOpen(false)}
-          onSaved={() => mutate()}
-        />
-      )}
       {qrCode && (
         <QrCodeModal title={qrCode.name} url={qrCode.url} onClose={() => setQrCode(null)} />
       )}
@@ -164,33 +143,6 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
             isClearable
             onValueChange={setFilter}
           />
-          {editing && (
-            <>
-              <Button
-                size="sm"
-                variant="flat"
-                startContent={<FaPlus />}
-                onPress={() => {
-                  setEditorName(undefined)
-                  setEditorOpen(true)
-                }}
-              >
-                添加
-              </Button>
-              <Button
-                size="sm"
-                variant="flat"
-                startContent={<MdEditDocument />}
-                isDisabled={!filteredProviders.length}
-                onPress={() => {
-                  setEditorName(filteredProviders[0]?.name)
-                  setEditorOpen(true)
-                }}
-              >
-                编辑
-              </Button>
-            </>
-          )}
           <Button
             size="sm"
             color="primary"
@@ -237,18 +189,13 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
                   className="ml-2"
                   size="sm"
                   onPress={() => {
-                    if (editing) {
-                      setEditorName(provider.name)
-                      setEditorOpen(true)
-                    } else {
-                      setShowDetails({
-                        show: false,
-                        privderType: 'proxy-providers',
-                        path: provider.name,
-                        type: provider.vehicleType,
-                        title: provider.name
-                      })
-                    }
+                    setShowDetails({
+                      show: false,
+                      privderType: 'proxy-providers',
+                      path: provider.name,
+                      type: provider.vehicleType,
+                      title: provider.name
+                    })
                   }}
                 >
                   {provider.vehicleType === 'File' ? (
@@ -268,7 +215,7 @@ const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }
                 </Button>
               </div>
             </SettingItem>
-            {!localMode && provider.subscriptionInfo && (
+            {provider.subscriptionInfo && (
               <SettingItem
                 divider={index !== providers.length - 1}
                 title={

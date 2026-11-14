@@ -18,7 +18,9 @@ import i18next, { resources } from '../../shared/i18n'
 import {
   DEFAULT_MIHOMO_LAN_ALLOWED_IPS,
   DEFAULT_MIHOMO_SKIP_AUTH_PREFIXES,
-  getDefaultMihomoTunDevice
+  getDefaultMihomoTunDevice,
+  DEFAULT_SIDER_ORDER,
+  SIDER_CARD_DEFAULT_STATUS
 } from '../../shared/appConfig'
 import { LEGACY_SIMPLE_PROFILE_ID, LOCAL_PROFILE_ID } from '../../shared/local-config'
 import { stringify } from './yaml'
@@ -305,6 +307,21 @@ async function migrateAppTheme(): Promise<void> {
   }
 }
 
+// 迁移：NEXO 侧边栏布局固定（已移除侧边栏设置），把旧版本保存的卡片顺序与尺寸恢复为默认值
+async function migrateSiderLayout(): Promise<void> {
+  const config = await getAppConfig()
+  const patch: Partial<IAppConfig> = {}
+  for (const [key, value] of Object.entries(SIDER_CARD_DEFAULT_STATUS)) {
+    if (config[key as keyof IAppConfig] !== value) {
+      ;(patch as Record<string, unknown>)[key] = value
+    }
+  }
+  if (JSON.stringify(config.siderOrder) !== JSON.stringify(DEFAULT_SIDER_ORDER)) {
+    patch.siderOrder = [...DEFAULT_SIDER_ORDER]
+  }
+  if (Object.keys(patch).length) await patchAppConfig(patch)
+}
+
 // 迁移：envType 字符串转数组
 async function migrateEnvType(): Promise<void> {
   const { envType } = await getAppConfig()
@@ -414,6 +431,7 @@ async function migrateLocalMode(): Promise<void> {
 async function migration(): Promise<void> {
   await Promise.all([
     migrateAppTheme(),
+    migrateSiderLayout(),
     migrateEnvType(),
     migrateTraySettings(),
     migrateRemovePassword(),

@@ -4,16 +4,13 @@ import { getSiderCardRoute } from '@renderer/utils/sider'
 import {
   Account,
   Connections,
-  DNS,
   Logs,
   Mihomo,
   NetworkPageComponent,
-  Override,
   Proxies,
   Resources,
   Rules,
   Settings,
-  Sniffer,
   Sysproxy,
   Traffic,
   Tun
@@ -59,24 +56,12 @@ const routes = [
     element: <Resources />
   },
   {
-    path: '/dns',
-    element: <DNS />
-  },
-  {
-    path: '/sniffer',
-    element: <Sniffer />
-  },
-  {
     path: '/logs',
     element: <Logs />
   },
   {
     path: '/connections',
     element: <Connections />
-  },
-  {
-    path: '/override',
-    element: <Override />
   },
   {
     path: '/account',

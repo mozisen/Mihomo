@@ -1,7 +1,6 @@
-import { useLayoutEffect, useEffect, useState } from 'react'
+import { useLayoutEffect } from 'react'
 import {
   DndContext,
-  closestCorners,
   PointerSensor,
   useSensor,
   useSensors,
@@ -16,19 +15,14 @@ import TunSwitcher from '@renderer/components/sider/tun-switcher'
 import AccountCard from '@renderer/components/sider/account-card'
 import ProxyCard from '@renderer/components/sider/proxy-card'
 import RuleCard from '@renderer/components/sider/rule-card'
-import DNSCard from '@renderer/components/sider/dns-card'
-import SniffCard from '@renderer/components/sider/sniff-card'
-import OverrideCard from '@renderer/components/sider/override-card'
 import ConnCard from '@renderer/components/sider/conn-card'
 import LogCard from '@renderer/components/sider/log-card'
 import MihomoCoreCard from '@renderer/components/sider/mihomo-core-card'
 import ResourceCard from '@renderer/components/sider/resource-card'
 import NetworkCard from '@renderer/components/sider/network-card'
 import UsageCard from '@renderer/components/sider/usage-card'
-import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { mergeSiderOrder, SIDER_CARD_ROUTES } from '@renderer/utils/sider'
+import { SIDER_CARD_KEYS, SIDER_CARD_ROUTES } from '@renderer/utils/sider'
 import { markInitialContentPartReady } from '@renderer/utils/startup'
-import { DEFAULT_SIDER_ORDER } from '../../../../shared/appConfig'
 
 const componentMap: Record<SiderCardKey, React.FC<{ iconOnly?: boolean; expanded?: boolean }>> = {
   sysproxy: SysproxySwitcher,
@@ -37,12 +31,9 @@ const componentMap: Record<SiderCardKey, React.FC<{ iconOnly?: boolean; expanded
   proxy: ProxyCard,
   mihomo: MihomoCoreCard,
   connection: ConnCard,
-  dns: DNSCard,
-  sniff: SniffCard,
   log: LogCard,
   rule: RuleCard,
   resource: ResourceCard,
-  override: OverrideCard,
   network: NetworkCard,
   usage: UsageCard
 }
@@ -54,10 +45,6 @@ interface Props {
 
 const SiderCards = (props: Props): React.JSX.Element => {
   const { iconOnly = false, expanded = false } = props
-  const { appConfig, patchAppConfig } = useAppConfig()
-  const siderOrder = appConfig?.siderOrder ?? DEFAULT_SIDER_ORDER
-  const lockSiderCards = appConfig?.lockSiderCards ?? false
-  const [order, setOrder] = useState<SiderCardKey[]>(mergeSiderOrder(siderOrder))
   const sensors = useSensors(useSensor(PointerSensor))
   const navigate: NavigateFunction = useNavigate()
 
@@ -65,42 +52,15 @@ const SiderCards = (props: Props): React.JSX.Element => {
     markInitialContentPartReady('sider')
   }, [])
 
-  useEffect(() => {
-    setOrder(mergeSiderOrder(siderOrder))
-  }, [siderOrder])
-
-  const onDragEnd = async (event: DragEndEvent): Promise<void> => {
-    const { active, over } = event
-    const activeId = active.id as SiderCardKey
-    if (over && !lockSiderCards) {
-      if (active.id !== over.id) {
-        const overId = over.id as SiderCardKey
-        const newOrder = order.slice()
-        const activeIndex = newOrder.indexOf(activeId)
-        const overIndex = newOrder.indexOf(overId)
-        if (activeIndex === -1 || overIndex === -1) return
-        newOrder.splice(activeIndex, 1)
-        newOrder.splice(overIndex, 0, activeId)
-        setOrder(newOrder)
-        await patchAppConfig({ siderOrder: newOrder })
-        return
-      }
-    }
-    const dest = SIDER_CARD_ROUTES[activeId]
+  // 卡片仍用 dnd-kit 的 sortable 包装（点击即导航），但顺序固定、不可拖动。
+  const onDragEnd = (event: DragEndEvent): void => {
+    const dest = SIDER_CARD_ROUTES[event.active.id as SiderCardKey]
     if (dest) navigate(dest)
   }
+  const lockTransform: Modifier = (args) => ({ ...args.transform, x: 0, y: 0 })
+  const collisionDetection: CollisionDetection = () => []
 
-  const lockTransform: Modifier = (args) => {
-    if (lockSiderCards) return { ...args.transform, x: 0, y: 0 }
-    return args.transform
-  }
-
-  const collisionDetection: CollisionDetection = (args) => {
-    if (lockSiderCards) return []
-    return closestCorners(args)
-  }
-
-  const cards = order.map((key) => {
+  const cards = SIDER_CARD_KEYS.map((key) => {
     const Component = componentMap[key]
     return <Component key={key} iconOnly={iconOnly} expanded={expanded} />
   })
@@ -122,7 +82,7 @@ const SiderCards = (props: Props): React.JSX.Element => {
         modifiers={[lockTransform]}
       >
         <div className="grid grid-cols-2 gap-2 m-2">
-          <SortableContext items={order}>{cards}</SortableContext>
+          <SortableContext items={[...SIDER_CARD_KEYS]}>{cards}</SortableContext>
         </div>
       </DndContext>
     </div>

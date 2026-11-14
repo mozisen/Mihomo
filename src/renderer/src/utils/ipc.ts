@@ -62,7 +62,6 @@ interface IpcApi {
   ) => Promise<TrafficUsageAggregate[]>
   importTrafficUsage: (batch: TrafficUsageImportBatch) => Promise<void>
   clearTrafficUsage: () => Promise<void>
-  getSmartOverrideContent: () => Promise<string | null>
   // AutoRun
   checkAutoRun: () => Promise<boolean>
   enableAutoRun: () => Promise<void>
@@ -81,14 +80,6 @@ interface IpcApi {
   setProfileConfig: (config: IProfileConfig) => Promise<void>
   getCurrentProfileItem: () => Promise<IProfileItem>
   getProfileItem: (id: string | undefined) => Promise<IProfileItem>
-  getProfileStr: (id: string) => Promise<string>
-  getProfileImportInfo: (
-    item: Pick<
-      IProfileItem,
-      'url' | 'useProxy' | 'userAgent' | 'authToken' | 'allowFixedInterval' | 'updateTimeout'
-    >
-  ) => Promise<Partial<IProfileItem>>
-  setProfileStr: (id: string, str: string) => Promise<void>
   addProfileItem: (
     item: Partial<IProfileItem>,
     localOptions?: import('../../../shared/local-config').LocalSubscriptionOptions
@@ -104,75 +95,16 @@ interface IpcApi {
   // Override
   getOverrideConfig: (force?: boolean) => Promise<IOverrideConfig>
   setOverrideConfig: (config: IOverrideConfig) => Promise<void>
-  getOverrideItem: (id: string) => Promise<IOverrideItem | undefined>
   addOverrideItem: (item: Partial<IOverrideItem>) => Promise<void>
   removeOverrideItem: (id: string) => Promise<void>
   updateOverrideItem: (item: IOverrideItem) => Promise<void>
-  getOverride: (id: string, ext: 'js' | 'yaml' | 'log') => Promise<string>
-  setOverride: (id: string, ext: 'js' | 'yaml', str: string) => Promise<void>
   // File
   getFileStr: (path: string) => Promise<string>
   setFileStr: (path: string, str: string) => Promise<void>
   convertMrsRuleset: (path: string, behavior: string) => Promise<string>
   getRuntimeConfig: () => Promise<IMihomoConfig>
-  getRuntimeConfigStr: () => Promise<string>
-  getRuleStr: (id: string) => Promise<string>
-  setRuleStr: (id: string, str: string) => Promise<void>
-  getLocalConfig: () => Promise<import('../../../shared/local-config').LocalState>
-  getLocalNode: (name?: string) => Promise<import('../../../shared/local-config').LocalObject>
-  createLocalNodes: (values: import('../../../shared/local-config').LocalObject[]) => Promise<void>
-  saveLocalNode: (
-    name: string,
-    value: import('../../../shared/local-config').LocalObject,
-    expected: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  removeLocalNode: (
-    name: string,
-    expected: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  getLocalRulesEditor: () => Promise<import('../../../shared/local-config').LocalRuleEditor>
-  saveLocalRules: (
-    change: import('../../../shared/local-config').LocalRuleChange,
-    expected: string[]
-  ) => Promise<void>
-  saveLocalRuleProvider: (
-    name: string | undefined,
-    nextName: string,
-    value: import('../../../shared/local-config').LocalObject | null,
-    expected?: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  getLocalProxyGroup: (
-    name?: string
-  ) => Promise<import('../../../shared/local-config').LocalProxyGroupEditor>
-  createLocalProxyGroup: (
-    value: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  saveLocalProxyGroup: (
-    name: string,
-    value: import('../../../shared/local-config').LocalObject,
-    expected: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  reorderLocalProxyGroups: (names: string[]) => Promise<void>
-  removeLocalProxyGroup: (
-    name: string,
-    expected: import('../../../shared/local-config').LocalObject
-  ) => Promise<void>
-  saveLocalDraft: (
-    draft: import('../../../shared/local-config').LocalDraft
-  ) => Promise<import('../../../shared/local-config').LocalPreview>
-  previewLocalConfig: () => Promise<import('../../../shared/local-config').LocalPreview>
-  publishLocalConfig: (
-    draft?: import('../../../shared/local-config').LocalDraft
-  ) => Promise<import('../../../shared/local-config').LocalPreview>
-  exportLocalConfig: () => Promise<
-    import('../../../shared/local-config').LocalPreview & { path?: string }
-  >
-  refreshLocalSource: (id: string) => Promise<import('../../../shared/local-config').LocalPreview>
-  removeLocalSource: (id: string) => Promise<import('../../../shared/local-config').LocalPreview>
   getFilePath: (ext: string[], title?: string, filterName?: string) => Promise<string[] | undefined>
-  readTextFile: (filePath: string) => Promise<string>
   readImageFileDataURL: (filePath: string) => Promise<string>
-  openFile: (type: 'profile' | 'override', id: string, ext?: 'yaml' | 'js') => Promise<void>
   // Core
   restartCore: () => Promise<void>
   getSmartModelStatus: () => Promise<ISmartModelStatus>
@@ -272,7 +204,6 @@ export const {
   queryTrafficUsageBreakdown,
   importTrafficUsage,
   clearTrafficUsage,
-  getSmartOverrideContent,
   // AutoRun
   checkAutoRun,
   enableAutoRun,
@@ -291,9 +222,6 @@ export const {
   setProfileConfig,
   getCurrentProfileItem,
   getProfileItem,
-  getProfileStr,
-  getProfileImportInfo,
-  setProfileStr,
   addProfileItem,
   removeProfileItem,
   updateProfileItem,
@@ -303,43 +231,16 @@ export const {
   // Override
   getOverrideConfig,
   setOverrideConfig,
-  getOverrideItem,
   addOverrideItem,
   removeOverrideItem,
   updateOverrideItem,
-  getOverride,
-  setOverride,
   // File
   getFileStr,
   setFileStr,
   convertMrsRuleset,
   getRuntimeConfig,
-  getRuntimeConfigStr,
-  getRuleStr,
-  setRuleStr,
-  getLocalConfig,
-  getLocalNode,
-  createLocalNodes,
-  saveLocalNode,
-  removeLocalNode,
-  getLocalProxyGroup,
-  getLocalRulesEditor,
-  saveLocalRules,
-  saveLocalRuleProvider,
-  createLocalProxyGroup,
-  saveLocalProxyGroup,
-  removeLocalProxyGroup,
-  reorderLocalProxyGroups,
-  saveLocalDraft,
-  previewLocalConfig,
-  publishLocalConfig,
-  exportLocalConfig,
-  refreshLocalSource,
-  removeLocalSource,
   getFilePath,
-  readTextFile,
   readImageFileDataURL,
-  openFile,
   // Core
   restartCore,
   getSmartModelStatus,

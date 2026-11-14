@@ -83,7 +83,6 @@ const GeneralConfig: React.FC = () => {
     disableHardwareAcceleration = false,
     useWindowFrame = false,
     rememberSelectedSiderCard = false,
-    lockSiderCards = false,
     autoQuitWithoutCore = false,
     autoQuitWithoutCoreDelay = 60,
     autoQuitWithoutCoreMode = 'core',
@@ -694,15 +693,6 @@ const GeneralConfig: React.FC = () => {
             isSelected={rememberSelectedSiderCard}
             onValueChange={async (v) => {
               await patchAppConfig({ rememberSelectedSiderCard: v })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title={t('settings.lockSiderCards')} divider>
-          <Switch
-            size="sm"
-            isSelected={lockSiderCards}
-            onValueChange={async (v) => {
-              await patchAppConfig({ lockSiderCards: v })
             }}
           />
         </SettingItem>

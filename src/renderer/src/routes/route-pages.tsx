@@ -3,7 +3,6 @@ import { onInitialContentReady } from '@renderer/utils/startup'
 import { createPreloadablePage } from './preloadable-page'
 
 const NetworkPage = createPreloadablePage(() => import('@renderer/pages/network'))
-const OverridePage = createPreloadablePage(() => import('@renderer/pages/override'))
 const ProxiesPage = createPreloadablePage(() => import('@renderer/pages/proxies'))
 const RulesPage = createPreloadablePage(() => import('@renderer/pages/rules'))
 const SettingsPage = createPreloadablePage(() => import('@renderer/pages/settings'))
@@ -14,12 +13,9 @@ const MihomoPage = createPreloadablePage(() => import('@renderer/pages/mihomo'))
 const SysproxyPage = createPreloadablePage(() => import('@renderer/pages/sysproxy'))
 const TunPage = createPreloadablePage(() => import('@renderer/pages/tun'))
 const ResourcesPage = createPreloadablePage(() => import('@renderer/pages/resources'))
-const DNSPage = createPreloadablePage(() => import('@renderer/pages/dns'))
-const SnifferPage = createPreloadablePage(() => import('@renderer/pages/sniffer'))
 const TrafficPage = createPreloadablePage(() => import('@renderer/pages/traffic'))
 
 export const NetworkPageComponent = NetworkPage.Page
-export const Override = OverridePage.Page
 export const Proxies = ProxiesPage.Page
 export const Rules = RulesPage.Page
 export const Settings = SettingsPage.Page
@@ -30,8 +26,6 @@ export const Mihomo = MihomoPage.Page
 export const Sysproxy = SysproxyPage.Page
 export const Tun = TunPage.Page
 export const Resources = ResourcesPage.Page
-export const DNS = DNSPage.Page
-export const Sniffer = SnifferPage.Page
 export const Traffic = TrafficPage.Page
 
 // 默认落地页立即预加载，避免首屏等待 chunk 下载。
@@ -45,10 +39,7 @@ const remainingPageLoaders: Array<() => Promise<unknown>> = [
   MihomoPage.preload,
   SysproxyPage.preload,
   TunPage.preload,
-  DNSPage.preload,
-  SnifferPage.preload,
   ResourcesPage.preload,
-  OverridePage.preload,
   LogsPage.preload,
   NetworkPage.preload,
   TrafficPage.preload
