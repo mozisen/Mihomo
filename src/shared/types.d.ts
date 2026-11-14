@@ -330,10 +330,6 @@ interface IAppConfig {
   sysproxyCardStatus?: CardStatus
   tunCardStatus?: CardStatus
   usageCardStatus?: CardStatus
-  githubToken?: string
-  gistAgeEncrypt?: boolean
-  gistAgeRecipient?: string
-  gistAgeSecretKey?: string
   autoQuitWithoutCore?: boolean
   autoQuitWithoutCoreDelay?: number
   autoQuitWithoutCoreMode?: 'core' | 'tray'
@@ -387,13 +383,6 @@ interface IAppConfig {
   customTrayIcons?: ICustomTrayIcons
   trayProxyGroupStyle?: 'default' | 'submenu'
   disableAnimations?: boolean
-  webdavUrl?: string
-  webdavDir?: string
-  webdavUsername?: string
-  webdavPassword?: string
-  webdavMaxBackups?: number
-  webdavBackupCron?: string
-  webdavIgnoreCert?: boolean
   useNameserverPolicy: boolean
   nameserverPolicy: { [key: string]: string | string[] }
   showWindowShortcut?: string

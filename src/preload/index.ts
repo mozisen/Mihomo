@@ -134,14 +134,6 @@ const validInvokeChannels = [
   'fetchMihomoTags',
   'installSpecificMihomoCore',
   'clearMihomoVersionCache',
-  // Backup
-  'webdavBackup',
-  'webdavRestore',
-  'listWebdavBackups',
-  'webdavDelete',
-  'reinitWebdavBackupScheduler',
-  'exportLocalBackup',
-  'importLocalBackup',
   // Theme
   'resolveThemes',
   'fetchThemes',
@@ -180,9 +172,6 @@ const validInvokeChannels = [
   'updatePluginProfile',
   'patchPluginItem',
   // Misc
-  'getGistUrl',
-  'generateGistAgeKeyPair',
-  'exportGistAgeSecretKey',
   'fetchIPInfo',
   'measureLatency',
   'getImageDataURL',

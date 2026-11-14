@@ -206,14 +206,6 @@ interface IpcApi {
   ) => Promise<{ name: string; zipball_url: string; tarball_url: string }[]>
   installSpecificMihomoCore: (version: string) => Promise<void>
   clearMihomoVersionCache: () => Promise<void>
-  // Backup
-  webdavBackup: () => Promise<boolean>
-  webdavRestore: (filename: string) => Promise<void>
-  listWebdavBackups: () => Promise<string[]>
-  webdavDelete: (filename: string) => Promise<void>
-  reinitWebdavBackupScheduler: () => Promise<void>
-  exportLocalBackup: () => Promise<boolean>
-  importLocalBackup: () => Promise<boolean>
   // Theme
   resolveThemes: () => Promise<{ key: string; label: string; content: string }[]>
   fetchThemes: () => Promise<void>
@@ -247,9 +239,6 @@ interface IpcApi {
   updatePluginProfile: (id: string, force?: boolean) => Promise<void>
   patchPluginItem: (id: string, patch: Partial<IPluginItem>) => Promise<void>
   // Misc
-  getGistUrl: () => Promise<string>
-  generateGistAgeKeyPair: () => Promise<{ secretKey: string; recipient: string }>
-  exportGistAgeSecretKey: () => Promise<boolean>
   fetchIPInfo: (url: string) => Promise<unknown>
   measureLatency: (url: string) => Promise<number | null>
   getImageDataURL: (url: string) => Promise<string>
@@ -398,14 +387,6 @@ export const {
   fetchMihomoTags,
   installSpecificMihomoCore,
   clearMihomoVersionCache,
-  // Backup
-  webdavBackup,
-  webdavRestore,
-  listWebdavBackups,
-  webdavDelete,
-  reinitWebdavBackupScheduler,
-  exportLocalBackup,
-  importLocalBackup,
   // Theme
   resolveThemes,
   fetchThemes,
@@ -439,9 +420,6 @@ export const {
   updatePluginProfile,
   patchPluginItem,
   // Misc
-  getGistUrl,
-  generateGistAgeKeyPair,
-  exportGistAgeSecretKey,
   fetchIPInfo,
   measureLatency,
   getImageDataURL,

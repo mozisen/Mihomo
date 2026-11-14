@@ -99,15 +99,6 @@ import {
   takeDnsOverrideAutoDisabledNotice
 } from '../core/dnsOverrideGuard'
 import { getSmartModelStatus, downloadSmartModel } from '../core/smartModel'
-import {
-  listWebdavBackups,
-  webdavBackup,
-  webdavDelete,
-  webdavRestore,
-  exportLocalBackup,
-  importLocalBackup,
-  reinitScheduler
-} from '../resolve/backup'
 import { getInterfaces } from '../sys/interface'
 import {
   closeTrayIcon,
@@ -127,7 +118,6 @@ import {
   resolveThemes,
   writeTheme
 } from '../resolve/theme'
-import { exportGistAgeSecretKey, generateGistAgeKeyPair, getGistUrl } from '../resolve/gistApi'
 import { startMonitor } from '../resolve/trafficMonitor'
 import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
 import { addProfileUpdater, removeProfileUpdater } from '../core/profileUpdater'
@@ -388,14 +378,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   fetchMihomoTags,
   installSpecificMihomoCore,
   clearMihomoVersionCache,
-  // Backup
-  webdavBackup,
-  webdavRestore,
-  listWebdavBackups,
-  webdavDelete,
-  reinitWebdavBackupScheduler: reinitScheduler,
-  exportLocalBackup,
-  importLocalBackup,
   // Theme
   resolveThemes,
   fetchThemes,
@@ -421,9 +403,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   updatePluginProfile,
   patchPluginItem,
   // Misc
-  getGistUrl,
-  generateGistAgeKeyPair,
-  exportGistAgeSecretKey,
   fetchIPInfo,
   measureLatency,
   getImageDataURL,

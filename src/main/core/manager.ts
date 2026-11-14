@@ -26,7 +26,6 @@ import {
   mihomoWorkConfigPath,
   mihomoWorkDir
 } from '../utils/dirs'
-import { uploadRuntimeConfigIfChanged } from '../resolve/gistApi'
 import { startMonitor } from '../resolve/trafficMonitor'
 import { isLocalProfile } from '../../shared/local-config'
 import { ensureRuntimeFiles, safeShowErrorBox } from '../utils/init'
@@ -705,11 +704,6 @@ function setupCoreListeners(
   }
 
   const completeCoreStartup = async (): Promise<void> => {
-    try {
-      await uploadRuntimeConfigIfChanged()
-    } catch (error) {
-      managerLogger.warn('Failed to sync runtime config to Gist', error)
-    }
     try {
       await patchMihomoConfig({ 'log-level': logLevel })
     } finally {

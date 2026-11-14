@@ -25,7 +25,6 @@ import { initNexoAccount, syncNexoAccountInBackground } from './nexo/account'
 import { startMonitor } from './resolve/trafficMonitor'
 import { showFloatingWindow } from './resolve/floatingWindow'
 import { logger, createLogger } from './utils/logger'
-import { initWebdavBackupScheduler } from './resolve/backup'
 import {
   createWindow,
   mainWindow,
@@ -350,9 +349,6 @@ app
             await Promise.allSettled([
               initProfileUpdater().catch((e) =>
                 mainLogger.warn('Failed to init profile updater', e)
-              ),
-              initWebdavBackupScheduler().catch((e) =>
-                mainLogger.warn('Failed to init webdav backup scheduler', e)
               ),
               checkAdminRestartForTun().catch((e) =>
                 mainLogger.warn('Failed admin-restart-for-tun follow-up', e)

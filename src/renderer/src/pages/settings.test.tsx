@@ -16,13 +16,11 @@ vi.mock('@renderer/components/base/base-page', () => ({
     </section>
   )
 }))
-vi.mock('@renderer/components/settings/webdav-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/general-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/mihomo-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/actions', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/shortcut-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/sider-config', () => ({ default: () => null }))
-vi.mock('@renderer/components/settings/local-backup-config', () => ({ default: () => null }))
 
 describe('Settings page', () => {
   it('has no docs, GitHub or Telegram link buttons in the header', () => {

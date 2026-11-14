@@ -474,12 +474,6 @@ export const mihomoHotReloadConfig = async (): Promise<void> => {
   } catch (error) {
     mihomoApiLogger.warn('Failed to sync DNS override state after hot reload', error)
   }
-  try {
-    const { scheduleRuntimeConfigUpload } = await import('../resolve/gistApi')
-    scheduleRuntimeConfigUpload()
-  } catch (error) {
-    mihomoApiLogger.warn('Failed to schedule runtime config Gist sync', error)
-  }
 }
 
 // Smart 内核 API
