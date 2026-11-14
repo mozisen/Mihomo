@@ -908,5 +908,22 @@
   "profiles.editInfo.source.group": "代理集合",
   "profiles.editInfo.source.nodes": "独立节点",
   "profiles.saveDraft": "保存草稿",
-  "profiles.publish": "发布"
+  "profiles.publish": "发布",
+  "sider.cards.account": "账户",
+  "account.title": "账户",
+  "account.status.notLoggedIn": "未登录",
+  "account.login.title": "登录 NEXO",
+  "account.login.subtitle": "登录您的账户以同步订阅",
+  "account.field.username": "账号",
+  "account.field.usernamePlaceholder": "请输入邮箱或用户名",
+  "account.field.password": "密码",
+  "account.field.passwordPlaceholder": "请输入密码",
+  "account.field.showPassword": "显示密码",
+  "account.field.hidePassword": "隐藏密码",
+  "account.login.submit": "登录",
+  "account.login.notReady": "登录服务尚未开放，敬请期待",
+  "account.validation.usernameRequired": "请输入账号",
+  "account.validation.passwordRequired": "请输入密码",
+  "guide.account.title": "账户",
+  "guide.account.description": "在这里登录您的 NEXO 账户。"
 }

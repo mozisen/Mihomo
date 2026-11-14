@@ -885,5 +885,22 @@
   "profiles.editInfo.source.group": "مجموعه پروکسی",
   "profiles.editInfo.source.nodes": "گره‌های جداگانه",
   "profiles.saveDraft": "ذخیره پیش‌نویس",
-  "profiles.publish": "انتشار"
+  "profiles.publish": "انتشار",
+  "sider.cards.account": "حساب کاربری",
+  "account.title": "حساب کاربری",
+  "account.status.notLoggedIn": "وارد نشده‌اید",
+  "account.login.title": "ورود به NEXO",
+  "account.login.subtitle": "برای همگام‌سازی اشتراک‌ها وارد شوید",
+  "account.field.username": "حساب",
+  "account.field.usernamePlaceholder": "ایمیل یا نام کاربری",
+  "account.field.password": "رمز عبور",
+  "account.field.passwordPlaceholder": "رمز عبور را وارد کنید",
+  "account.field.showPassword": "نمایش رمز عبور",
+  "account.field.hidePassword": "پنهان کردن رمز عبور",
+  "account.login.submit": "ورود",
+  "account.login.notReady": "ورود هنوز در دسترس نیست",
+  "account.validation.usernameRequired": "حساب را وارد کنید",
+  "account.validation.passwordRequired": "رمز عبور را وارد کنید",
+  "guide.account.title": "حساب کاربری",
+  "guide.account.description": "در اینجا وارد حساب NEXO خود شوید."
 }

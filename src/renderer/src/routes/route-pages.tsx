@@ -8,6 +8,7 @@ const ProxiesPage = createPreloadablePage(() => import('@renderer/pages/proxies'
 const RulesPage = createPreloadablePage(() => import('@renderer/pages/rules'))
 const SettingsPage = createPreloadablePage(() => import('@renderer/pages/settings'))
 const ProfilesPage = createPreloadablePage(() => import('@renderer/pages/profiles'))
+const AccountPage = createPreloadablePage(() => import('@renderer/pages/account'))
 const LogsPage = createPreloadablePage(() => import('@renderer/pages/logs'))
 const ConnectionsPage = createPreloadablePage(() => import('@renderer/pages/connections'))
 const MihomoPage = createPreloadablePage(() => import('@renderer/pages/mihomo'))
@@ -25,6 +26,7 @@ export const Proxies = ProxiesPage.Page
 export const Rules = RulesPage.Page
 export const Settings = SettingsPage.Page
 export const Profiles = ProfilesPage.Page
+export const Account = AccountPage.Page
 export const Logs = LogsPage.Page
 export const Connections = ConnectionsPage.Page
 export const Mihomo = MihomoPage.Page
@@ -41,6 +43,7 @@ void ProxiesPage.preload().catch(() => {})
 
 const remainingPageLoaders: Array<() => Promise<unknown>> = [
   SettingsPage.preload,
+  AccountPage.preload,
   ProfilesPage.preload,
   ConnectionsPage.preload,
   RulesPage.preload,

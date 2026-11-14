@@ -891,5 +891,22 @@
   "profiles.editInfo.source.group": "Прокси-провайдер",
   "profiles.editInfo.source.nodes": "Отдельные узлы",
   "profiles.saveDraft": "Сохранить черновик",
-  "profiles.publish": "Опубликовать"
+  "profiles.publish": "Опубликовать",
+  "sider.cards.account": "Аккаунт",
+  "account.title": "Аккаунт",
+  "account.status.notLoggedIn": "Вход не выполнен",
+  "account.login.title": "Вход в NEXO",
+  "account.login.subtitle": "Войдите, чтобы синхронизировать подписки",
+  "account.field.username": "Аккаунт",
+  "account.field.usernamePlaceholder": "Email или имя пользователя",
+  "account.field.password": "Пароль",
+  "account.field.passwordPlaceholder": "Введите пароль",
+  "account.field.showPassword": "Показать пароль",
+  "account.field.hidePassword": "Скрыть пароль",
+  "account.login.submit": "Войти",
+  "account.login.notReady": "Вход пока недоступен",
+  "account.validation.usernameRequired": "Введите аккаунт",
+  "account.validation.passwordRequired": "Введите пароль",
+  "guide.account.title": "Аккаунт",
+  "guide.account.description": "Здесь можно войти в аккаунт NEXO."
 }

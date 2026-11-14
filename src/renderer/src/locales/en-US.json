@@ -908,5 +908,22 @@
   "profiles.editInfo.source.group": "Proxy Provider",
   "profiles.editInfo.source.nodes": "Individual Nodes",
   "profiles.saveDraft": "Save Draft",
-  "profiles.publish": "Publish"
+  "profiles.publish": "Publish",
+  "sider.cards.account": "Account",
+  "account.title": "Account",
+  "account.status.notLoggedIn": "Not signed in",
+  "account.login.title": "Sign in to NEXO",
+  "account.login.subtitle": "Sign in to sync your subscriptions",
+  "account.field.username": "Account",
+  "account.field.usernamePlaceholder": "Email or username",
+  "account.field.password": "Password",
+  "account.field.passwordPlaceholder": "Enter your password",
+  "account.field.showPassword": "Show password",
+  "account.field.hidePassword": "Hide password",
+  "account.login.submit": "Sign in",
+  "account.login.notReady": "Sign-in is not available yet",
+  "account.validation.usernameRequired": "Please enter your account",
+  "account.validation.passwordRequired": "Please enter your password",
+  "guide.account.title": "Account",
+  "guide.account.description": "Sign in to your NEXO account here."
 }

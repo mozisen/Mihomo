@@ -25,6 +25,6 @@ describe('SiderConfig', () => {
       expect(html).not.toContain(`data-title="sider.cards.${key}"`)
     }
     expect(html).toContain('data-title="sider.cards.proxies"')
-    expect(html).toContain('data-title="sider.cards.profiles"')
+    expect(html).toContain('data-title="sider.cards.account"')
   })
 })

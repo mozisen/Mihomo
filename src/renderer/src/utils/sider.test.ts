@@ -39,4 +39,10 @@ describe('hidden sider cards', () => {
     expect(getSiderCardByPath('/sniffer')).toBeUndefined()
     expect(getSiderCardByPath('/proxies')).toBe('proxy')
   })
+
+  it('routes the profile slot to the account page', () => {
+    expect(getSiderCardRoute('profile')).toBe('/account')
+    expect(getSiderCardByPath('/account')).toBe('profile')
+    expect(getSiderCardByPath('/profiles')).toBeUndefined()
+  })
 })

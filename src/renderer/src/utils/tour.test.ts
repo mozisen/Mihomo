@@ -66,7 +66,15 @@ describe('tour language synchronization', () => {
     createTourDriver(i18n.t, vi.fn())
     const config = mocks.driver.mock.calls[0][0] as Config
     const elements = config.steps?.map((step) => step.element) ?? []
-    for (const hidden of ['.override-card', '.dns-card', '.sniff-card', '.substore-card']) {
+    expect(elements).toContain('.account-card')
+    for (const hidden of [
+      '.override-card',
+      '.dns-card',
+      '.sniff-card',
+      '.substore-card',
+      '.profile-card',
+      '.substore-import'
+    ]) {
       expect(elements).not.toContain(hidden)
     }
   })

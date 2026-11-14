@@ -9,7 +9,7 @@ import type { FC } from 'react'
 const titleMap: Record<string, string> = {
   sysproxyCardStatus: 'sider.cards.systemProxy',
   tunCardStatus: 'sider.cards.tun',
-  profileCardStatus: 'sider.cards.profiles',
+  profileCardStatus: 'sider.cards.account',
   proxyCardStatus: 'sider.cards.proxies',
   ruleCardStatus: 'sider.cards.rules',
   resourceCardStatus: 'sider.cards.resources',

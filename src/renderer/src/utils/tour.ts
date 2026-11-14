@@ -54,44 +54,11 @@ export function createTourDriver(t: TFunction, navigate: NavigateFunction): void
         }
       },
       {
-        element: '.profile-card',
+        element: '.account-card',
         popover: {
-          title: t('guide.profile.title'),
-          description: t('guide.profile.description'),
+          title: t('guide.account.title'),
+          description: t('guide.account.description'),
           side: 'right',
-          align: 'start',
-          onNextClick: async (): Promise<void> => {
-            navigate('/profiles')
-            setTimeout(() => {
-              driverInstance?.moveNext()
-            }, 0)
-          }
-        }
-      },
-      {
-        element: '.profiles-sticky',
-        popover: {
-          title: t('guide.import.title'),
-          description: t('guide.import.description'),
-          side: 'bottom',
-          align: 'start'
-        }
-      },
-      {
-        element: '.substore-import',
-        popover: {
-          title: t('guide.substore.title'),
-          description: t('guide.substore.description'),
-          side: 'bottom',
-          align: 'start'
-        }
-      },
-      {
-        element: '.new-profile',
-        popover: {
-          title: t('guide.localProfile.title'),
-          description: t('guide.localProfile.description'),
-          side: 'bottom',
           align: 'start'
         }
       },
@@ -151,7 +118,7 @@ export function createTourDriver(t: TFunction, navigate: NavigateFunction): void
           side: 'top',
           align: 'center',
           onNextClick: async (): Promise<void> => {
-            navigate('/profiles')
+            navigate('/account')
             setTimeout(() => {
               driverInstance?.destroy()
             }, 0)

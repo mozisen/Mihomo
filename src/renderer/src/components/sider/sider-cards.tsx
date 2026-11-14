@@ -13,7 +13,7 @@ import { SortableContext } from '@dnd-kit/sortable'
 import { NavigateFunction, useNavigate } from 'react-router-dom'
 import SysproxySwitcher from '@renderer/components/sider/sysproxy-switcher'
 import TunSwitcher from '@renderer/components/sider/tun-switcher'
-import ProfileCard from '@renderer/components/sider/profile-card'
+import AccountCard from '@renderer/components/sider/account-card'
 import ProxyCard from '@renderer/components/sider/proxy-card'
 import RuleCard from '@renderer/components/sider/rule-card'
 import DNSCard from '@renderer/components/sider/dns-card'
@@ -34,7 +34,7 @@ import { DEFAULT_SIDER_ORDER } from '../../../../shared/appConfig'
 const componentMap: Record<SiderCardKey, React.FC<{ iconOnly?: boolean; expanded?: boolean }>> = {
   sysproxy: SysproxySwitcher,
   tun: TunSwitcher,
-  profile: ProfileCard,
+  profile: AccountCard,
   proxy: ProxyCard,
   mihomo: MihomoCoreCard,
   connection: ConnCard,

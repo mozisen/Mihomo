@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { getSiderCardRoute } from '@renderer/utils/sider'
 import {
+  Account,
   Connections,
   DNS,
   Logs,
@@ -78,6 +79,10 @@ const routes = [
   {
     path: '/override',
     element: <Override />
+  },
+  {
+    path: '/account',
+    element: <Account />
   },
   {
     path: '/profiles',

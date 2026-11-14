@@ -14,7 +14,7 @@ export const SIDER_CARD_KEYS: SiderCardKey[] = DEFAULT_SIDER_ORDER.filter(
 export const SIDER_CARD_ROUTES: Record<SiderCardKey, string> = {
   sysproxy: '/sysproxy',
   tun: '/tun',
-  profile: '/profiles',
+  profile: '/account',
   proxy: '/proxies',
   rule: '/rules',
   resource: '/resources',
