@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('electron', () => ({
-  app: { getVersion: () => '2.0.4', getPath: () => '/tmp' },
+  app: { getVersion: () => '1.0.0', getPath: () => '/tmp' },
   shell: {}
 }))
 vi.mock('./window', () => ({ mainWindow: null }))
@@ -35,6 +35,7 @@ describe('NEXO branding', () => {
     const pkg = JSON.parse(readText('package.json'))
     expect(pkg.name).toBe('nexo')
     expect(pkg.description).toBe('NEXO')
+    expect(pkg.version).toBe('1.0.0')
   })
 
   it('packages the app as NEXO with nexo-* artifacts', () => {
