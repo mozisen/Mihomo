@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
-    "@modelcontextprotocol/sdk": "^1.32.2",
     "@noble/ciphers": "2.4.0",
     "@types/d3": "^7.4.3",
     "@types/plist": "^3.0.5",

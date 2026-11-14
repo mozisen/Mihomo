@@ -44,7 +44,6 @@ import {
 } from './lifecycle'
 import { configureAppPaths } from './utils/dirs'
 import { setTrafficUsageEnabled } from './traffic/recorder'
-import { stopMcpServer, syncMcpServer } from './mcp'
 
 async function getWindowsPowerShellMajorVersion(): Promise<number | null> {
   // 仅 PS 3.0+ 写入 \3\ 键（\1\ 键恒为 2.0，不可用）。
@@ -93,9 +92,6 @@ configureAppPaths()
 const mainLogger = createLogger('Main')
 subscribeAppConfig((config) => {
   setTrafficUsageEnabled(config.enableTrafficLogger === true)
-  if (app.isReady()) {
-    void syncMcpServer(config).catch((error) => mainLogger.warn('Failed to sync MCP server', error))
-  }
 })
 
 export { mainWindow, showMainWindow, triggerMainWindow, closeMainWindow }
@@ -312,12 +308,6 @@ app
     })
 
     registerIpcMainHandlers()
-    void syncMcpServer(appConfig).catch((error) =>
-      mainLogger.warn('Failed to start MCP server', error)
-    )
-    app.once('will-quit', () => {
-      void stopMcpServer()
-    })
 
     try {
       await createWindow()

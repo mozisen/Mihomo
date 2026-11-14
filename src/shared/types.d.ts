@@ -283,9 +283,6 @@ interface ISmartModelStatus {
 }
 
 interface IAppConfig {
-  mcpEnabled?: boolean
-  mcpPort?: number
-  mcpToken?: string
   core: 'mihomo' | 'mihomo-alpha' | 'mihomo-smart' | 'mihomo-specific'
   specificVersion?: string
   enableSmartCore: boolean

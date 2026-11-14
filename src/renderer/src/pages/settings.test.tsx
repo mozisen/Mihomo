@@ -24,7 +24,6 @@ vi.mock('@renderer/components/settings/shortcut-config', () => ({ default: () =>
 vi.mock('@renderer/components/settings/sider-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/substore-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/local-backup-config', () => ({ default: () => null }))
-vi.mock('@renderer/components/settings/mcp-config', () => ({ default: () => null }))
 
 describe('Settings page', () => {
   it('has no docs, GitHub or Telegram link buttons in the header', () => {
