@@ -1,8 +1,6 @@
 // 妙妙屋X 主控加密通道（/api/secure/*）的纯 Node 实现，协议见
 // https://miaomiaowux.com/docs/client-api/ 。不依赖 Electron，便于单元测试。
 import {
-  createCipheriv,
-  createDecipheriv,
   createPublicKey,
   diffieHellman,
   generateKeyPairSync,
@@ -12,6 +10,8 @@ import {
   verify,
   type KeyObject
 } from 'crypto'
+// Electron 的 crypto 基于 BoringSSL，不支持 createCipheriv('chacha20-poly1305')；改用纯 JS 实现
+import { chacha20poly1305 } from '@noble/ciphers/chacha.js'
 
 /** 许可证服务验签公钥（Ed25519，原始 32 字节的 base64）。 */
 export const LICENSE_ISSUER_PUBLIC_KEY = '/cKXW8AIOPE6ChoZtXjP8N+KkIYvKLvnpLyaLPrpTQM='
@@ -120,9 +120,9 @@ function deriveKey(shared: Buffer, salt: Buffer, info: string): Buffer {
 
 function seal(key: Buffer, plaintext: Buffer): Buffer {
   const nonce = randomBytes(NONCE_LEN)
-  const cipher = createCipheriv('chacha20-poly1305', key, nonce, { authTagLength: TAG_LEN })
-  const ct = Buffer.concat([cipher.update(plaintext), cipher.final()])
-  return Buffer.concat([nonce, ct, cipher.getAuthTag()])
+  // 输出为 ct‖tag，与主控的 nonce‖ct‖tag 格式一致
+  const ctAndTag = chacha20poly1305(key, nonce).encrypt(plaintext)
+  return Buffer.concat([nonce, ctAndTag])
 }
 
 function open(key: Buffer, sealed: Buffer): Buffer {
@@ -130,12 +130,8 @@ function open(key: Buffer, sealed: Buffer): Buffer {
     throw new SecureChannelError('sealed payload too short', 'bad_envelope')
   }
   const nonce = sealed.subarray(0, NONCE_LEN)
-  const tag = sealed.subarray(sealed.length - TAG_LEN)
-  const ct = sealed.subarray(NONCE_LEN, sealed.length - TAG_LEN)
-  const decipher = createDecipheriv('chacha20-poly1305', key, nonce, { authTagLength: TAG_LEN })
-  decipher.setAuthTag(tag)
   try {
-    return Buffer.concat([decipher.update(ct), decipher.final()])
+    return Buffer.from(chacha20poly1305(key, nonce).decrypt(sealed.subarray(NONCE_LEN)))
   } catch {
     throw new SecureChannelError('failed to decrypt payload', 'bad_envelope')
   }
