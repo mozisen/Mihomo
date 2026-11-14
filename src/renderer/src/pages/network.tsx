@@ -25,6 +25,7 @@ import { IoMdGlobe, IoMdPulse } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
 import { fetchIPInfo, measureLatency } from '@renderer/utils/ipc'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { countryFlagEmoji } from '@renderer/utils/flag'
 import { DEFAULT_NETWORK_INFO_CARD_ORDER } from '../../../shared/appConfig'
 
 type IPProvider = 'ip.sb' | 'ipwho.is' | 'ipapi.is'
@@ -52,12 +53,17 @@ const IP_ENDPOINTS: Record<IPProvider, string> = {
 }
 
 const CountryFlag: React.FC<{ code?: string; className?: string }> = ({ code, className }) => {
-  if (!code || code.length !== 2) return null
+  const flag = countryFlagEmoji(code)
+  if (!flag) return null
   return (
     <span
-      className={`fi fi-${code.toLowerCase()} rounded-sm ${className ?? ''}`}
+      role="img"
+      aria-label={code?.toUpperCase()}
+      className={`flag-emoji ${className ?? ''}`}
       style={{ fontSize: '1rem', lineHeight: 1 }}
-    />
+    >
+      {flag}
+    </span>
   )
 }
 
