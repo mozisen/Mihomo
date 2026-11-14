@@ -17,6 +17,8 @@ import { PluginConfigProvider } from './hooks/use-plugin-config'
 import { RulesProvider } from './hooks/use-rules'
 import { GroupsProvider } from './hooks/use-groups'
 import { ToastProvider } from './components/base/toast'
+import { NexoAccountProvider } from './hooks/use-nexo-account'
+import LoginGate from './components/nexo/login-gate'
 import './i18n'
 
 let F12Count = 0
@@ -62,7 +64,11 @@ init().then(() => {
                         <GroupsProvider>
                           <RulesProvider>
                             <ToastProvider>
-                              <App />
+                              <NexoAccountProvider>
+                                <LoginGate>
+                                  <App />
+                                </LoginGate>
+                              </NexoAccountProvider>
                             </ToastProvider>
                           </RulesProvider>
                         </GroupsProvider>

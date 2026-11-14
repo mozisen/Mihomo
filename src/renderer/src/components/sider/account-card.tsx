@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useNexoAccount } from '@renderer/hooks/use-nexo-account'
 import { useTranslation } from 'react-i18next'
 import SiderItem from './sider-item'
 
@@ -18,6 +19,11 @@ const AccountCard: React.FC<Props> = (props) => {
   const { t } = useTranslation()
   const { appConfig } = useAppConfig()
   const { iconOnly, expanded } = props
+  const { state } = useNexoAccount()
+  const accountLabel =
+    state.status === 'loggedIn'
+      ? state.account.nickname || state.account.username
+      : t('account.status.notLoggedIn')
   const { profileCardStatus = 'col-span-2', disableAnimations = false } = appConfig || {}
   const location = useLocation()
   const match = location.pathname.includes('/account')
@@ -76,7 +82,7 @@ const AccountCard: React.FC<Props> = (props) => {
             </Button>
             {profileCardStatus === 'col-span-2' && (
               <span className={`mr-3 text-sm ${match ? textColor : 'text-foreground-500'}`}>
-                {t('account.status.notLoggedIn')}
+                {accountLabel}
               </span>
             )}
           </div>

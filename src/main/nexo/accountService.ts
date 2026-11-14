@@ -1,4 +1,5 @@
 // NEXO 账户：登录妙妙屋X、保持在线、自动更新绑定的订阅。依赖全部注入，便于单元测试。
+import type { NexoAccountInfo, NexoAccountState } from '../../shared/nexo'
 import {
   MasterApiError,
   pickSubscription,
@@ -7,7 +8,6 @@ import {
   type MasterSubscription,
   type SubscriptionUserInfo
 } from './client'
-import type { NexoAccountInfo, NexoAccountState } from '../../shared/nexo'
 
 export type { NexoAccountInfo, NexoAccountState }
 
