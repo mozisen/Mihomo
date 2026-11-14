@@ -18,7 +18,7 @@ import 'driver.js/dist/driver.css'
 import { useTranslation } from 'react-i18next'
 import { DEFAULT_ENABLE_TRAFFIC_LOGGER } from '../../shared/appConfig'
 import SiderItem from './components/sider/sider-item'
-import MihomoIcon from './components/base/mihomo-icon'
+import NexoLogo from './components/base/nexo-logo'
 import { getSiderCardByPath } from './utils/sider'
 import { markInitialContentPartReady } from './utils/startup'
 
@@ -227,7 +227,7 @@ const App: React.FC = () => {
             <div className="side sider-rail-background" aria-hidden="true" />
             <div className="app-drag flex shrink-0 items-center z-40 bg-transparent h-11.25">
               <div style={{ width: narrowWidth }} className="flex shrink-0 justify-center">
-                {platform !== 'darwin' && <MihomoIcon className="h-8 leading-8 text-lg mx-px" />}
+                {platform !== 'darwin' && <NexoLogo className="h-8 w-8 mx-px" />}
               </div>
               <span
                 className="sider-item-label text-lg font-bold"
@@ -265,7 +265,7 @@ const App: React.FC = () => {
                 className={`flex justify-between p-2 ${!useWindowFrame && platform === 'darwin' ? 'ml-15' : ''}`}
               >
                 <div className="flex ml-1">
-                  <MihomoIcon className="h-8 leading-8 text-lg mx-px" />
+                  <NexoLogo className="h-8 w-8 mr-1" />
                   <h3 className="text-lg font-bold leading-8">Clash Party</h3>
                 </div>
                 <UpdaterButton />
