@@ -8,6 +8,6 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 清理可能存在的旧版本文件
-rm -rf "/Applications/NEXO.app"
+rm -rf "/Applications/nexo.app"
 
 exit 0

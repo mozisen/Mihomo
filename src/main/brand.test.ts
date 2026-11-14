@@ -10,13 +10,15 @@ describe('NEXO branding', () => {
   it('uses NEXO identity in package metadata', () => {
     const pkg = JSON.parse(readText('package.json'))
     expect(pkg.name).toBe('nexo')
-    expect(pkg.description).toBe('NEXO')
+    expect(pkg.description).toBe('nexo')
     expect(pkg.version).toBe('1.0.0')
   })
 
   it('packages the app as NEXO with nexo-* artifacts', () => {
     const config = parse(readText('electron-builder.yml'))
-    expect(config.productName).toBe('NEXO')
+    // 程序名、安装目录（Program Files\\nexo）、exe 名都取 productName：统一小写
+    expect(config.productName).toBe('nexo')
+    expect(config.linux.desktop.entry.Name).toBe('nexo')
     expect(config.appId).toBe('com.nexo.app')
 
     const artifactNames = [
@@ -40,7 +42,23 @@ describe('NEXO branding', () => {
   })
 
   it('shows NEXO as the window title', () => {
-    expect(readText('src', 'renderer', 'index.html')).toContain('<title>NEXO</title>')
+    expect(readText('src', 'renderer', 'index.html')).toContain('<title>nexo</title>')
+  })
+
+  it('never shows the app name in upper case', () => {
+    const localesDir = join(root, 'src', 'renderer', 'src', 'locales')
+    for (const file of readdirSync(localesDir).filter((f) => f.endsWith('.json'))) {
+      expect(readFileSync(join(localesDir, file), 'utf-8'), file).not.toContain('NEXO')
+    }
+    for (const file of [
+      ['src', 'renderer', 'floating.html'],
+      ['src', 'main', 'resolve', 'tray.ts'],
+      ['src', 'main', 'sys', 'misc.ts'],
+      ['build', 'pkg-scripts', 'preinstall'],
+      ['build', 'pkg-scripts', 'postinstall']
+    ]) {
+      expect(readText(...file), file.join('/')).not.toMatch(/'NEXO|NEXO\.app|<title>NEXO/)
+    }
   })
 })
 

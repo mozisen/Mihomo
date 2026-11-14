@@ -195,13 +195,13 @@ export async function enableAutoRun(): Promise<void> {
   if (process.platform === 'linux') {
     let desktop = `
 [Desktop Entry]
-Name=NEXO
+Name=nexo
 Exec=${exePath()} %U
 Terminal=false
 Type=Application
 Icon=mihomo-party
 StartupWMClass=mihomo-party
-Comment=NEXO
+Comment=nexo
 Categories=Utility;
 `
 

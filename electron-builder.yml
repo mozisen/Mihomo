@@ -1,5 +1,5 @@
 appId: com.nexo.app
-productName: NEXO
+productName: nexo
 directories:
   buildResources: build
 files:
@@ -21,7 +21,7 @@ extraResources:
   - from: './extra/'
     to: ''
 protocols:
-  name: 'NEXO URI Scheme'
+  name: 'nexo URI Scheme'
   schemes:
     - 'clash'
     - 'mihomo'
@@ -70,7 +70,7 @@ linux:
       to: 'install.sh'
   desktop:
     entry:
-      Name: NEXO
+      Name: nexo
       GenericName: Proxy Client
       Comment: A GUI client based on Mihomo
       MimeType: 'x-scheme-handler/clash;x-scheme-handler/mihomo'

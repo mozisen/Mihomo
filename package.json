@@ -1,10 +1,10 @@
 {
   "name": "nexo",
   "version": "1.0.0",
-  "description": "NEXO",
+  "description": "nexo",
   "type": "module",
   "main": "./out/main/index.js",
-  "author": "NEXO",
+  "author": "nexo",
   "homepage": "https://clashparty.org",
   "scripts": {
     "test": "vitest run",

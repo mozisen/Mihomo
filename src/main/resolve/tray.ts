@@ -815,7 +815,7 @@ async function updateTrayToolTip(
     status.push(t('tray.tooltip.customIcon'))
   }
 
-  tray.setToolTip(['NEXO', ...status].join('\n'))
+  tray.setToolTip(['nexo', ...status].join('\n'))
 }
 
 function setTrayImage(iconPath: string): void {

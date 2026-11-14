@@ -221,7 +221,7 @@ const App: React.FC = () => {
                 className="sider-item-label text-lg font-bold"
                 aria-hidden={!siderExpandedOnHover}
               >
-                NEXO
+                nexo
               </span>
             </div>
             <Suspense fallback={<div className="min-h-0 flex-1" />}>
@@ -251,7 +251,7 @@ const App: React.FC = () => {
               >
                 <div className="flex ml-1">
                   <NexoLogo className="h-8 w-8 mr-1" />
-                  <h3 className="text-lg font-bold leading-8">NEXO</h3>
+                  <h3 className="text-lg font-bold leading-8">nexo</h3>
                 </div>
                 <Button
                   size="sm"
