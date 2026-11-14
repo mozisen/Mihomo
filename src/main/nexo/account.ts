@@ -18,6 +18,7 @@ import { getRuntimeConfig } from '../core/factory'
 import { NexoAccountService, type NexoAccountState, type NexoSession } from './accountService'
 import { MasterClient } from './client'
 import { type NexoGuardContext } from './ipcGuard'
+import { errorCode, errorDetail } from './errors'
 import { decryptText, encryptText } from './secretStore'
 
 /** 妙妙屋X 主控地址（经 ECHO 反代）。 */
@@ -92,25 +93,13 @@ export function syncNexoAccountInBackground(): void {
 
 // ---- IPC ----
 
-function errorCode(e: unknown): string {
-  if (e && typeof e === 'object') {
-    const { status, code, message } = e as { status?: number; code?: string; message?: string }
-    if (status === 401) return 'INVALID_CREDENTIALS'
-    if (status === 429) return 'RATE_LIMITED'
-    if (code === 'cert_unavailable' || code === 'network') return 'MASTER_UNAVAILABLE'
-    if (code?.startsWith('cert_')) return 'MASTER_UNTRUSTED'
-    if (message === 'NO_SUBSCRIPTION') return 'NO_SUBSCRIPTION'
-  }
-  return 'UNKNOWN'
-}
-
-/** 把主控错误转成渲染进程可本地化的错误码（不暴露内部细节）。 */
+/** 把主控错误转成渲染进程可本地化的错误码，并附上便于排查的简短详情。 */
 async function withCode<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn()
   } catch (e) {
     logger.warn('NEXO account request failed', e)
-    throw new Error(`NEXO:${errorCode(e)}`)
+    throw new Error(`NEXO:${errorCode(e)}|${errorDetail(e)}`)
   }
 }
 

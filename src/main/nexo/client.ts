@@ -91,6 +91,8 @@ export class MasterClient {
   private readonly userAgent: string
   private readonly issuerPublicKey?: string
   private cert?: { masterPub: Buffer; expireUnix: number }
+  /** 服务器时间 − 本机时间（秒）。本机时钟不准时，请求时间戳与证书有效期都按服务器时间计算 */
+  private clockSkewSec = 0
 
   constructor(opts: MasterClientOptions) {
     const url = new URL(opts.baseUrl)
@@ -105,16 +107,32 @@ export class MasterClient {
   }
 
   private nowUnix(): number {
-    return Math.floor(this.now() / 1000)
+    return Math.floor(this.now() / 1000) + this.clockSkewSec
+  }
+
+  /** 主控要求请求时间戳与服务器相差不超过 120 秒；用响应的 Date 头校正本机时钟偏差。 */
+  private observeServerDate(header: string | null): void {
+    if (!header) return
+    const server = Date.parse(header)
+    if (Number.isNaN(server)) return
+    const skew = Math.round((server - this.now()) / 1000)
+    // Date 头只精确到秒，小偏差不必校正
+    this.clockSkewSec = Math.abs(skew) > 10 ? skew : 0
+  }
+
+  get clockSkewSeconds(): number {
+    return this.clockSkewSec
   }
 
   private async request(path: string, init: RequestInit = {}): Promise<Response> {
     try {
-      return await this.fetchImpl(this.baseUrl + path, {
+      const res = await this.fetchImpl(this.baseUrl + path, {
         ...init,
         headers: { 'User-Agent': this.userAgent, ...(init.headers ?? {}) },
         signal: AbortSignal.timeout(this.timeoutMs)
       })
+      this.observeServerDate(res.headers.get('date'))
+      return res
     } catch (e) {
       throw new SecureChannelError(
         `cannot reach ${this.host}: ${e instanceof Error ? e.message : String(e)}`,
@@ -145,6 +163,22 @@ export class MasterClient {
   async rpc<T>(
     path: string,
     opts: { method?: string; token?: string; body?: Record<string, unknown> } = {}
+  ): Promise<T> {
+    const skewBefore = this.clockSkewSec
+    try {
+      return await this.rpcOnce<T>(path, opts)
+    } catch (e) {
+      // 这次响应才发现本机时钟偏差：时间戳被拒，按校正后的时间重试一次
+      const retriable =
+        e instanceof MasterApiError && e.status !== 401 && e.status !== 429 && e.status < 500
+      if (retriable && this.clockSkewSec !== skewBefore) return await this.rpcOnce<T>(path, opts)
+      throw e
+    }
+  }
+
+  private async rpcOnce<T>(
+    path: string,
+    opts: { method?: string; token?: string; body?: Record<string, unknown> }
   ): Promise<T> {
     const masterPub = await this.masterPublicKey()
     const payload: Record<string, unknown> = {

@@ -15,7 +15,8 @@ export type { NexoAccountInfo, NexoAccountState }
 export interface NexoSession {
   username: string
   apiToken: string
-  tokenName: string
+  /** 个人 API 令牌的名称；为空表示主控不允许创建 API 令牌，退回使用 30 天的会话令牌 */
+  tokenName?: string
   account?: NexoAccountInfo
 }
 
@@ -111,14 +112,24 @@ export class NexoAccountService {
 
   private async completeLogin(login: LoginSuccess): Promise<NexoAccountState> {
     // 会话令牌 30 天过期且不续期；换成个人 API 令牌（手动吊销前一直有效）实现“保持在线”
-    const tokenName = `NEXO ${this.deps.deviceName()}`.slice(0, 64)
-    await this.deps.client.revokeApiTokenByName(login.token, tokenName).catch(() => {})
-    const apiToken = await this.deps.client.createApiToken(login.token, tokenName)
+    let tokenName: string | undefined = `NEXO ${this.deps.deviceName()}`.slice(0, 64)
+    let apiToken = login.token
+    try {
+      await this.deps.client.revokeApiTokenByName(login.token, tokenName).catch(() => {})
+      apiToken = await this.deps.client.createApiToken(login.token, tokenName)
+    } catch (e) {
+      if (e instanceof MasterApiError && e.status === 401) throw e
+      // 主控未开放个人 API 令牌：仍可用会话令牌登录（30 天有效，失效后需要重新登录）
+      this.deps.log?.warn('Cannot create NEXO API token, falling back to the session token', e)
+      tokenName = undefined
+      apiToken = login.token
+    }
     const account = { username: login.username, nickname: login.nickname, email: login.email }
     this.session = { username: login.username, apiToken, tokenName, account }
     await this.deps.saveSession(this.session)
     this.setState({ status: 'loggedIn', account, syncing: true })
-    await this.sync()
+    // 已经登录成功：更新配置失败只在账户页提示，不算登录失败
+    await this.sync().catch(() => {})
     return this.state
   }
 
@@ -185,7 +196,7 @@ export class NexoAccountService {
     const session = this.session
     this.session = undefined
     this.pending2fa = undefined
-    if (session && opts.revoke !== false) {
+    if (session?.tokenName && opts.revoke !== false) {
       await this.deps.client
         .revokeApiTokenByName(session.apiToken, session.tokenName)
         .catch((e) => this.deps.log?.warn('Failed to revoke NEXO API token', e))

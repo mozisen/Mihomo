@@ -940,6 +940,7 @@
   "account.error.UNKNOWN": "操作失败，请稍后重试",
   "account.error.SESSION_EXPIRED": "登录已失效，请重新登录",
   "account.error.syncFailed": "配置更新失败，正在使用上次的配置",
+  "account.error.detail": "详情：{{detail}}",
   "account.traffic.title": "流量",
   "account.traffic.used": "已用",
   "account.traffic.remaining": "剩余",

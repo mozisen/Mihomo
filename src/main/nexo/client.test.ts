@@ -160,6 +160,37 @@ describe('MasterClient', () => {
     await expect(client.profile(login.session.token)).rejects.toMatchObject({ status: 401 })
   })
 
+  it('corrects for a wrong local clock using the server Date header', async () => {
+    const master = createTestMaster()
+    // 本机时钟慢了 10 分钟：请求时间戳会被主控以 stale request 拒绝，除非按服务器时间校正
+    const client = new MasterClient({
+      baseUrl: 'https://mx.voee.de',
+      userAgent: UA,
+      fetch: master.fetch,
+      issuerPublicKey: master.issuerPublicKey,
+      now: () => Date.now() - 600_000
+    })
+    const result = await client.login('alice', 'secret')
+    expect(result.kind).toBe('ok')
+    expect(Math.abs(client.clockSkewSeconds - 600)).toBeLessThanOrEqual(2)
+  })
+
+  it('retries once when the clock skew is only discovered on the rejected request', async () => {
+    const master = createTestMaster()
+    let offset = 0
+    const client = new MasterClient({
+      baseUrl: 'https://mx.voee.de',
+      userAgent: UA,
+      fetch: master.fetch,
+      issuerPublicKey: master.issuerPublicKey,
+      now: () => Date.now() - offset
+    })
+    await client.masterPublicKey()
+    offset = 600_000 // 证书缓存后本机时间被改
+    const result = await client.login('alice', 'secret')
+    expect(result.kind).toBe('ok')
+  })
+
   it('only accepts https master addresses', () => {
     expect(() => new MasterClient({ baseUrl: 'http://mx.voee.de', userAgent: UA })).toThrow(/https/)
   })

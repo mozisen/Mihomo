@@ -38,6 +38,13 @@ export const NEXO_ERROR_CODES = [
 
 export type NexoErrorCode = (typeof NEXO_ERROR_CODES)[number]
 
+/** 从 IPC 错误中取出主控返回的错误详情（`NEXO:<code>|<detail>`），用于排查。 */
+export function nexoErrorDetail(e: unknown): string | undefined {
+  const message = e instanceof Error ? e.message : String(e ?? '')
+  const match = /NEXO:[A-Z_]+\|(.+)$/s.exec(message)
+  return match?.[1]?.trim() || undefined
+}
+
 /** 从 IPC 错误中取出 NEXO 错误码。 */
 export function nexoErrorCode(e: unknown): NexoErrorCode {
   const message = e instanceof Error ? e.message : String(e ?? '')

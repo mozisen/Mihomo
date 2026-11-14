@@ -63,6 +63,32 @@ describe('NexoAccountService', () => {
     expect(master.apiTokens.size).toBe(1)
   })
 
+  it('falls back to the session token when API tokens are not allowed', async () => {
+    const { master, store, service } = setup({ apiTokensDisabled: true })
+    const state = await service.login('alice', 'secret')
+    expect(state.status).toBe('loggedIn')
+    expect(store.session?.apiToken).toMatch(/^sess-/)
+    expect(store.session?.tokenName).toBeUndefined()
+    expect(store.profile).toContain('proxies:')
+    await service.logout()
+    expect(master.calls.filter((c) => c.startsWith('DELETE'))).toEqual([])
+  })
+
+  it('stays logged in when the first config update fails', async () => {
+    const { store, service } = setup()
+    // 下载订阅失败：仍算登录成功，错误显示在账户页
+    const spy = vi
+      .spyOn(MasterClient.prototype, 'downloadSubscription')
+      .mockRejectedValueOnce(new Error('subscription download failed (HTTP 502)'))
+    const state = await service.login('alice', 'secret')
+    spy.mockRestore()
+    expect(state).toMatchObject({
+      status: 'loggedIn',
+      error: 'subscription download failed (HTTP 502)'
+    })
+    expect(store.session).toBeDefined()
+  })
+
   it('handles two-factor login', async () => {
     const { store, service } = setup({
       users: { bob: { password: 'pw', twoFactorCode: '654321' } }

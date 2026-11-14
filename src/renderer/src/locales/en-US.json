@@ -940,6 +940,7 @@
   "account.error.UNKNOWN": "Something went wrong. Try again later",
   "account.error.SESSION_EXPIRED": "Your session has expired. Sign in again",
   "account.error.syncFailed": "Could not update the config. Using the last one",
+  "account.error.detail": "Details: {{detail}}",
   "account.traffic.title": "Traffic",
   "account.traffic.used": "Used",
   "account.traffic.remaining": "Remaining",

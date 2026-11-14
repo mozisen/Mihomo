@@ -8,7 +8,7 @@ import LoginPanel from '@renderer/components/nexo/login-panel'
 import { useNexoAccount } from '@renderer/hooks/use-nexo-account'
 import { nexoLogout, nexoRefresh } from '@renderer/utils/ipc'
 import { buildAccountView } from '@renderer/utils/nexo-account'
-import { nexoErrorCode, type NexoAccountInfo } from '../../../shared/nexo'
+import { nexoErrorCode, nexoErrorDetail, type NexoAccountInfo } from '../../../shared/nexo'
 
 export { validateLoginForm } from '@renderer/components/nexo/login-panel'
 export type { LoginForm, LoginFormErrors } from '@renderer/components/nexo/login-panel'
@@ -44,17 +44,21 @@ export const AccountDetails: React.FC<{
   const { t } = useTranslation()
   const { mutate } = useNexoAccount()
   const [refreshError, setRefreshError] = useState('')
+  const [refreshDetail, setRefreshDetail] = useState('')
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const view = buildAccountView(account)
   const shownError = refreshError || (error ? t('account.error.syncFailed') : '')
+  const shownDetail = refreshError ? refreshDetail : error
 
   const refresh = async (): Promise<void> => {
     setRefreshError('')
+    setRefreshDetail('')
     try {
       await nexoRefresh()
     } catch (e) {
       setRefreshError(t(`account.error.${nexoErrorCode(e)}`))
+      setRefreshDetail(nexoErrorDetail(e) ?? '')
     } finally {
       void mutate()
     }
@@ -148,9 +152,14 @@ export const AccountDetails: React.FC<{
       </Card>
 
       {shownError && (
-        <p role="alert" className="text-sm text-danger px-1">
-          {shownError}
-        </p>
+        <div role="alert" className="flex flex-col gap-1 px-1">
+          <p className="text-sm text-danger">{shownError}</p>
+          {shownDetail && (
+            <p className="text-xs text-foreground-400 break-all select-text">
+              {t('account.error.detail', { detail: shownDetail })}
+            </p>
+          )}
+        </div>
       )}
 
       <div className="flex gap-2">

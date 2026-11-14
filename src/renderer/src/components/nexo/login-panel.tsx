@@ -5,7 +5,7 @@ import { IoEye, IoEyeOff } from 'react-icons/io5'
 import NexoLogo from '@renderer/components/base/nexo-logo'
 import { useNexoAccount } from '@renderer/hooks/use-nexo-account'
 import { nexoCancel2fa, nexoLogin, nexoLogin2fa } from '@renderer/utils/ipc'
-import { nexoErrorCode } from '../../../../shared/nexo'
+import { nexoErrorCode, nexoErrorDetail } from '../../../../shared/nexo'
 
 export interface LoginForm {
   username: string
@@ -36,6 +36,7 @@ const LoginPanel: React.FC = () => {
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [detail, setDetail] = useState('')
 
   const sessionError = state.status === 'loggedOut' ? state.error : undefined
   const message = error || (sessionError ? t(`account.error.${sessionError}`) : '')
@@ -49,10 +50,12 @@ const LoginPanel: React.FC = () => {
   const run = async (action: () => Promise<unknown>): Promise<void> => {
     setBusy(true)
     setError('')
+    setDetail('')
     try {
       await action()
     } catch (e) {
       setError(t(`account.error.${nexoErrorCode(e)}`))
+      setDetail(nexoErrorDetail(e) ?? '')
     } finally {
       setBusy(false)
       void mutate()
@@ -164,9 +167,14 @@ const LoginPanel: React.FC = () => {
           </form>
         )}
         {message && (
-          <p role="alert" className="text-center text-sm text-danger">
-            {message}
-          </p>
+          <div role="alert" className="flex flex-col gap-1 text-center">
+            <p className="text-sm text-danger">{message}</p>
+            {error && detail && (
+              <p className="text-xs text-foreground-400 break-all select-text">
+                {t('account.error.detail', { detail })}
+              </p>
+            )}
+          </div>
         )}
       </CardBody>
     </Card>

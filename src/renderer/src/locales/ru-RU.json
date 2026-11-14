@@ -923,6 +923,7 @@
   "account.error.UNKNOWN": "Не удалось выполнить. Повторите позже",
   "account.error.SESSION_EXPIRED": "Сеанс истёк. Войдите снова",
   "account.error.syncFailed": "Не удалось обновить конфигурацию. Используется предыдущая",
+  "account.error.detail": "Подробности: {{detail}}",
   "account.traffic.title": "Трафик",
   "account.traffic.used": "Использовано",
   "account.traffic.remaining": "Осталось",

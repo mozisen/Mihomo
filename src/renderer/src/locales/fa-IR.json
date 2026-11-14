@@ -917,6 +917,7 @@
   "account.error.UNKNOWN": "خطایی رخ داد. بعداً دوباره امتحان کنید",
   "account.error.SESSION_EXPIRED": "نشست منقضی شده است. دوباره وارد شوید",
   "account.error.syncFailed": "به‌روزرسانی پیکربندی ناموفق بود. از نسخه قبلی استفاده می‌شود",
+  "account.error.detail": "جزئیات: {{detail}}",
   "account.traffic.title": "ترافیک",
   "account.traffic.used": "مصرف‌شده",
   "account.traffic.remaining": "باقی‌مانده",

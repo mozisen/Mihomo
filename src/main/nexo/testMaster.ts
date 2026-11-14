@@ -17,6 +17,8 @@ export interface TestMasterOptions {
   users?: Record<string, { password: string; twoFactorCode?: string }>
   subscriptionYaml?: string
   userInfoHeader?: string
+  /** 模拟主控不允许普通用户创建个人 API 令牌 */
+  apiTokensDisabled?: boolean
 }
 
 export interface TestMaster {
@@ -112,6 +114,7 @@ export function createTestMaster(opts: TestMasterOptions = {}): TestMaster {
     }
     if (path === '/user/token') return [200, { token: subToken, user_short_code: 'U5r' }]
     if (path === '/user/api-tokens' && method === 'POST') {
+      if (opts.apiTokensDisabled) return [403, { error: 'api tokens disabled' }]
       const token = `mmwx_${nextId}`
       apiTokens.set(token, { id: nextId++, name: String(p.name), username: user })
       return [201, { success: true, token, name: p.name }]
@@ -133,7 +136,14 @@ export function createTestMaster(opts: TestMasterOptions = {}): TestMaster {
     return [404, { error: 'not found' }]
   }
 
+  // 真实主控（经 ECHO 反代）每个响应都带 Date 头
   const fetchImpl = async (url: string, init?: RequestInit): Promise<Response> => {
+    const res = await route(url, init)
+    res.headers.set('date', new Date().toUTCString())
+    return res
+  }
+
+  const route = async (url: string, init?: RequestInit): Promise<Response> => {
     const u = new URL(url)
     if (u.hostname !== domain) throw new Error(`unexpected host ${u.hostname}`)
     if (u.pathname === '/api/secure/cert') {
