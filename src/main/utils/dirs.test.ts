@@ -10,7 +10,7 @@ const EXE = path.join(EXE_DIR, 'Electron')
 
 let packaged = false
 let portable = false
-let appName = 'mihomo-party'
+let appName = 'nexo'
 const paths: Record<string, string> = {}
 const setPath = vi.fn((name: string, value: string) => {
   paths[name] = value
@@ -44,10 +44,10 @@ vi.mock('@electron-toolkit/utils', () => ({ is: { dev: true } }))
 beforeEach(() => {
   packaged = false
   portable = false
-  appName = 'mihomo-party'
+  appName = 'nexo'
   Object.assign(paths, {
     appData: APP_DATA,
-    userData: path.join(APP_DATA, 'mihomo-party'),
+    userData: path.join(APP_DATA, 'nexo'),
     home: HOME,
     exe: EXE
   })
@@ -63,9 +63,9 @@ describe('configureAppPaths', () => {
     const { configureAppPaths } = await import('./dirs')
     configureAppPaths()
 
-    expect(setName).toHaveBeenCalledWith('mihomo-party-dev')
-    expect(paths.userData).toBe(path.join(APP_DATA, 'mihomo-party-dev'))
-    expect(paths.sessionData).toBe(path.join(APP_DATA, 'mihomo-party-dev', 'cache'))
+    expect(setName).toHaveBeenCalledWith('nexo-dev')
+    expect(paths.userData).toBe(path.join(APP_DATA, 'nexo-dev'))
+    expect(paths.sessionData).toBe(path.join(APP_DATA, 'nexo-dev', 'cache'))
   })
 
   it('leaves packaged stable and dev-release builds on production paths', async () => {
@@ -74,8 +74,8 @@ describe('configureAppPaths', () => {
     configureAppPaths()
 
     expect(setName).not.toHaveBeenCalled()
-    expect(paths.userData).toBe(path.join(APP_DATA, 'mihomo-party'))
-    expect(paths.sessionData).toBe(path.join(APP_DATA, 'mihomo-party', 'cache'))
+    expect(paths.userData).toBe(path.join(APP_DATA, 'nexo'))
+    expect(paths.sessionData).toBe(path.join(APP_DATA, 'nexo', 'cache'))
   })
 
   it('keeps portable userData precedence over local development isolation', async () => {
@@ -83,7 +83,7 @@ describe('configureAppPaths', () => {
     const { configureAppPaths } = await import('./dirs')
     configureAppPaths()
 
-    expect(setName).toHaveBeenCalledWith('mihomo-party-dev')
+    expect(setName).toHaveBeenCalledWith('nexo-dev')
     expect(paths.userData).toBe(path.join(EXE_DIR, 'data'))
     expect(paths.sessionData).toBe(path.join(EXE_DIR, 'data', 'cache'))
     expect(setPath).toHaveBeenLastCalledWith('sessionData', path.join(EXE_DIR, 'data', 'cache'))

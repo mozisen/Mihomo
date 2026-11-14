@@ -235,7 +235,7 @@ export function createMcpServer(): McpServer {
   mcp.registerTool(
     'list_capabilities',
     {
-      title: 'List Clash Party capabilities',
+      title: 'List NEXO capabilities',
       description: 'List the read, write, and operational capabilities available through MCP.',
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
     },
@@ -245,7 +245,7 @@ export function createMcpServer(): McpServer {
   mcp.registerTool(
     'get_state',
     {
-      title: 'Read Clash Party state',
+      title: 'Read NEXO state',
       description: 'Read the app, Mihomo, profile, and current profile state in one call.',
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }
     },
@@ -262,7 +262,7 @@ export function createMcpServer(): McpServer {
     'restart_core',
     {
       title: 'Restart Mihomo core',
-      description: 'Perform the same full core restart used by the Clash Party UI.',
+      description: 'Perform the same full core restart used by the NEXO UI.',
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
     },
     async () => {
@@ -275,9 +275,9 @@ export function createMcpServer(): McpServer {
   mcp.registerTool(
     'call',
     {
-      title: 'Call Clash Party capability',
+      title: 'Call NEXO capability',
       description:
-        'Call any listed Clash Party capability. Set confirm=true for operations marked requiresConfirmation.',
+        'Call any listed NEXO capability. Set confirm=true for operations marked requiresConfirmation.',
       inputSchema: {
         method: z.string().min(1),
         args: z.array(z.unknown()).default([]),
@@ -300,7 +300,7 @@ export function createMcpServer(): McpServer {
   mcp.registerResource(
     'capabilities',
     'mihomo-party://capabilities',
-    { description: 'Available Clash Party MCP capabilities', mimeType: 'application/json' },
+    { description: 'Available NEXO MCP capabilities', mimeType: 'application/json' },
     async (uri) => ({
       contents: [{ uri: uri.href, text: JSON.stringify(getMcpCapabilityMetadata(), null, 2) }]
     })

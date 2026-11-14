@@ -9,10 +9,11 @@ import { exePath, homeDir } from '../utils/dirs'
 import { managerLogger } from '../utils/logger'
 import { checkAdminPrivileges } from '../core/admin'
 
-const appName = 'mihomo-party'
+const appName = 'nexo'
 // 1.x 通过 AppleScript 往 System Events 写登录项，这些旧条目不受 Service Management 管理，
 // 升级后必须单独清理，否则会与新登录项同时生效导致开机启动两次。
-const darwinLegacyLoginItemNames = ['Clash Party', 'Mihomo Party']
+// NEXO 是独立应用：不要清理 Clash Party / Mihomo Party 的登录项，避免影响用户另装的原版。
+const darwinLegacyLoginItemNames: string[] = []
 
 // 旧登录项清理属于尽力而为：条目不存在、或系统未授予自动化权限时都直接忽略。
 async function removeDarwinLegacyLoginItems(): Promise<void> {
@@ -194,13 +195,13 @@ export async function enableAutoRun(): Promise<void> {
   if (process.platform === 'linux') {
     let desktop = `
 [Desktop Entry]
-Name=mihomo-party
+Name=NEXO
 Exec=${exePath()} %U
 Terminal=false
 Type=Application
 Icon=mihomo-party
 StartupWMClass=mihomo-party
-Comment=Clash Party
+Comment=NEXO
 Categories=Utility;
 `
 

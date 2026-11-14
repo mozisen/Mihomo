@@ -23,6 +23,10 @@ const GITHUB_PROXIES = [
   'https://download.mihomo.party'
 ]
 
+// NEXO 暂无独立的发布渠道。上游的更新源会把 NEXO 替换成原版 Clash Party，
+// 因此在配置好 NEXO 自己的 latest.yml 之前，更新检查始终返回“无更新”。
+export const APP_UPDATE_ENABLED = false
+
 let updateInstallPromise: Promise<void> | undefined
 
 interface GitHubReleaseAsset {
@@ -97,6 +101,7 @@ async function getGitHubAssetSha256(
 }
 
 export async function checkUpdate(): Promise<IAppVersion | undefined> {
+  if (!APP_UPDATE_ENABLED) return undefined
   const [{ 'mixed-port': mixedPort = DEFAULT_MIHOMO_PORTS.mixed }, { githubProxy = '' }] =
     await Promise.all([getControledMihomoConfig(), getAppConfig()])
   const githubUrl =
@@ -152,11 +157,11 @@ async function installUpdate(version: string): Promise<void> {
     await Promise.all([getControledMihomoConfig(), getAppConfig()])
   const githubBase = `https://github.com/mihomo-party-org/mihomo-party/releases/download/v${version}/`
   const fileMap = {
-    'win32-x64': `clash-party-windows-${version}-x64-setup.exe`,
-    'win32-ia32': `clash-party-windows-${version}-ia32-setup.exe`,
-    'win32-arm64': `clash-party-windows-${version}-arm64-setup.exe`,
-    'darwin-x64': `clash-party-macos-${version}-x64.pkg`,
-    'darwin-arm64': `clash-party-macos-${version}-arm64.pkg`
+    'win32-x64': `nexo-windows-${version}-x64-setup.exe`,
+    'win32-ia32': `nexo-windows-${version}-ia32-setup.exe`,
+    'win32-arm64': `nexo-windows-${version}-arm64-setup.exe`,
+    'darwin-x64': `nexo-macos-${version}-x64.pkg`,
+    'darwin-arm64': `nexo-macos-${version}-arm64.pkg`
   }
   let file = fileMap[`${process.platform}-${process.arch}`]
   if (isPortable()) {
