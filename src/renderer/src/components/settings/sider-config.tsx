@@ -1,4 +1,5 @@
 import SettingCard from '@renderer/components/base/base-setting-card'
+import { isSiderCardHidden } from '@renderer/utils/sider'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { Radio, RadioGroup } from '@heroui/react'
@@ -51,7 +52,9 @@ const SiderConfig: FC = () => {
     usageCardStatus: appConfig?.usageCardStatus || 'col-span-1'
   }
 
-  const cardStatusEntries = Object.entries(cardStatus)
+  const cardStatusEntries = Object.entries(cardStatus).filter(
+    ([key]) => !isSiderCardHidden(key.replace(/CardStatus$/, ''))
+  )
 
   return (
     <SettingCard title={t('sider.title')}>

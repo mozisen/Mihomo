@@ -144,30 +144,6 @@ export function createTourDriver(t: TFunction, navigate: NavigateFunction): void
         }
       },
       {
-        element: '.override-card',
-        popover: {
-          title: t('guide.override.title'),
-          description: t('guide.override.description'),
-          side: 'right',
-          align: 'center'
-        }
-      },
-      {
-        element: '.dns-card',
-        popover: {
-          title: t('guide.dns.title'),
-          description: t('guide.dns.description'),
-          side: 'right',
-          align: 'center',
-          onNextClick: async (): Promise<void> => {
-            navigate('/profiles')
-            setTimeout(() => {
-              driverInstance?.moveNext()
-            }, 0)
-          }
-        }
-      },
-      {
         element: 'none',
         popover: {
           title: t('guide.end.title'),

@@ -58,4 +58,16 @@ describe('tour language synchronization', () => {
     if (active) expect(mocks.drive).toHaveBeenCalledWith(3)
     else expect(mocks.drive).not.toHaveBeenCalled()
   })
+
+  it('does not point the tour at hidden sider cards', async () => {
+    const { createTourDriver } = await import('./tour')
+    const i18n = createInstance()
+    await i18n.init({ lng: 'en-US', resources: { 'en-US': { translation: enUS } } })
+    createTourDriver(i18n.t, vi.fn())
+    const config = mocks.driver.mock.calls[0][0] as Config
+    const elements = config.steps?.map((step) => step.element) ?? []
+    for (const hidden of ['.override-card', '.dns-card', '.sniff-card', '.substore-card']) {
+      expect(elements).not.toContain(hidden)
+    }
+  })
 })
