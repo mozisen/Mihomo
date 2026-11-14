@@ -231,3 +231,86 @@ describe('buildAccountInfo', () => {
     expect(info).toMatchObject({ trafficUsed: 3, trafficTotal: 30, lastSync: 5 })
   })
 })
+
+describe('optional account details', () => {
+  const login = async (opts: Parameters<typeof createTestMaster>[0]) => {
+    const ctx = setup(opts)
+    await ctx.service.init()
+    await ctx.service.login('alice', 'secret')
+    const s = ctx.service.getState()
+    return { ...ctx, account: s.status === 'loggedIn' ? s.account : undefined }
+  }
+
+  it('reads the reset day of the current package and the online IPs', async () => {
+    const { account } = await login({
+      extraRoutes: {
+        '/user/package-assignments': [
+          200,
+          [
+            { id: 3, reset_day: 1, is_reset: true },
+            { id: 7, reset_day: 15, is_reset: true }
+          ]
+        ],
+        '/user/traffic/live': [
+          200,
+          { ips: [{ ip: '1.2.3.4', region: 'TW' }, { ip: '1.2.3.4' }, { ip: '5.6.7.8' }, {}] }
+        ]
+      }
+    })
+    expect(account?.resetDay).toBe(15)
+    expect(account?.onlineIps).toEqual(['1.2.3.4', '5.6.7.8'])
+  })
+
+  it('falls back to the second candidate path and the wrapped response shape', async () => {
+    const { account, master, service } = await login({
+      extraRoutes: {
+        '/user/packages': [200, { assignments: [{ id: 7, reset_day: 9, is_reset: true }] }],
+        '/user/traffic-live': [200, { ips: [] }]
+      }
+    })
+    expect(account?.resetDay).toBe(9)
+    expect(account?.onlineIps).toEqual([])
+    master.calls.length = 0
+    await service.sync()
+    // 已知命中的路径：之后不再试第一个候选
+    expect(master.calls).toContain('GET /user/packages')
+    expect(master.calls).not.toContain('GET /user/package-assignments')
+  })
+
+  it('stops probing once no candidate exists', async () => {
+    const { account, master, service } = await login({})
+    expect(account?.resetDay).toBeUndefined()
+    expect(account?.onlineIps).toBeUndefined()
+    master.calls.length = 0
+    await service.sync()
+    expect(
+      master.calls.filter(
+        (c) => c.startsWith('GET /user/pack') || c.startsWith('GET /user/traffic')
+      )
+    ).toEqual([])
+  })
+
+  it('does not log out when an optional endpoint rejects the token', async () => {
+    const { service, store, account } = await login({
+      extraRoutes: { '/user/package-assignments': [401, { error: 'unauthorized' }] }
+    })
+    expect(service.getState().status).toBe('loggedIn')
+    expect(store.profile).toBeDefined()
+    expect(account?.resetDay).toBeUndefined()
+  })
+
+  it('ignores a package that does not reset', async () => {
+    const { account } = await login({
+      extraRoutes: {
+        '/user/package-assignments': [
+          200,
+          [
+            { id: 7, reset_day: 15, is_reset: false },
+            { id: 3, reset_day: 1, is_reset: true }
+          ]
+        ]
+      }
+    })
+    expect(account?.resetDay).toBeUndefined()
+  })
+})

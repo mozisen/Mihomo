@@ -2,6 +2,7 @@
 import type { NexoAccountInfo, NexoAccountState } from '../../shared/nexo'
 import {
   MasterApiError,
+  pickResetDay,
   pickSubscription,
   type LoginSuccess,
   type MasterClient,
@@ -167,7 +168,11 @@ export class NexoAccountService {
         name: sub.name || 'NEXO',
         userInfo: downloaded.userInfo
       })
-      const account = buildAccountInfo(profile, sub, subs, downloaded.userInfo, this.now())
+      const extras = await this.fetchExtras(session.apiToken, sub)
+      const account = {
+        ...buildAccountInfo(profile, sub, subs, downloaded.userInfo, this.now()),
+        ...extras
+      }
       if (this.session !== session) return
       session.account = account
       await this.deps.saveSession(session)
@@ -190,6 +195,35 @@ export class NexoAccountService {
       this.deps.log?.warn('NEXO subscription sync failed', e)
       throw e
     }
+  }
+
+  /** 重置日与在线 IP 走猜测路径的可选接口：拿不到就留空，绝不影响登录与订阅。 */
+  private async fetchExtras(
+    token: string,
+    sub: MasterSubscription
+  ): Promise<Pick<NexoAccountInfo, 'resetDay' | 'onlineIps'>> {
+    const { client, log } = this.deps
+    const [assignments, ips] = await Promise.allSettled([
+      client.packageAssignments(token),
+      client.onlineIps(token)
+    ])
+    const out: Pick<NexoAccountInfo, 'resetDay' | 'onlineIps'> = {}
+    if (assignments.status === 'fulfilled' && assignments.value) {
+      const day = pickResetDay(assignments.value, sub)
+      if (day) out.resetDay = day
+    }
+    if (ips.status === 'fulfilled' && ips.value) {
+      out.onlineIps = [...new Set(ips.value.map((x) => x.ip))]
+    }
+    for (const [name, r] of [
+      ['packageAssignments', assignments],
+      ['trafficLive', ips]
+    ] as const) {
+      if (r.status === 'rejected') log?.warn(`NEXO optional endpoint ${name} failed`, r.reason)
+      else
+        log?.info(`NEXO optional endpoint ${name}: ${client.optionalPath(name) ?? 'unavailable'}`)
+    }
+    return out
   }
 
   async logout(opts: { revoke?: boolean; error?: string } = {}): Promise<void> {

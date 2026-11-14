@@ -57,6 +57,29 @@ export interface MasterProfile {
   is_admin?: boolean
 }
 
+export interface MasterPackageAssignment {
+  id?: number
+  reset_day?: number
+  is_reset?: boolean
+}
+
+export interface MasterOnlineIp {
+  ip: string
+  region?: string
+  isp?: string
+}
+
+/**
+ * 用户面板有、但客户端 API 文档没写的接口。官方前端把路径换成了带密钥的散列，
+ * 这里是按命名习惯猜的候选路径，依次尝试。
+ */
+export const OPTIONAL_ENDPOINTS = {
+  packageAssignments: ['/user/package-assignments', '/user/packages'],
+  trafficLive: ['/user/traffic/live', '/user/traffic-live']
+} as const
+
+export type OptionalEndpoint = keyof typeof OPTIONAL_ENDPOINTS
+
 export interface SubscriptionUserInfo {
   upload: number
   download: number
@@ -91,6 +114,8 @@ export class MasterClient {
   private readonly userAgent: string
   private readonly issuerPublicKey?: string
   private cert?: { masterPub: Buffer; expireUnix: number }
+  /** 可选接口探测结果：命中的路径，或 null 表示候选全部不存在（本次启动不再尝试） */
+  private readonly optionalPaths = new Map<OptionalEndpoint, string | null>()
   /** 服务器时间 − 本机时间（秒）。本机时钟不准时，请求时间戳与证书有效期都按服务器时间计算 */
   private clockSkewSec = 0
 
@@ -268,6 +293,56 @@ export class MasterClient {
     }
   }
 
+  /**
+   * 调用猜测路径的可选接口：404/405 换下一个候选，全部不存在就记住、不再请求。
+   * 其它错误（含 401）直接抛出，由调用方当作“暂时拿不到”处理。
+   * 返回 undefined 表示主控没有这个接口。
+   */
+  async optionalRpc<T>(name: OptionalEndpoint, token: string): Promise<T | undefined> {
+    const known = this.optionalPaths.get(name)
+    if (known === null) return undefined
+    const candidates = known ? [known] : OPTIONAL_ENDPOINTS[name]
+    for (const path of candidates) {
+      try {
+        const data = await this.rpc<T>(path, { token })
+        this.optionalPaths.set(name, path)
+        return data
+      } catch (e) {
+        if (e instanceof MasterApiError && (e.status === 404 || e.status === 405)) continue
+        throw e
+      }
+    }
+    if (!known) this.optionalPaths.set(name, null)
+    return undefined
+  }
+
+  /** 已探测到的可选接口路径（日志用） */
+  optionalPath(name: OptionalEndpoint): string | null | undefined {
+    return this.optionalPaths.get(name)
+  }
+
+  async packageAssignments(token: string): Promise<MasterPackageAssignment[] | undefined> {
+    const data = await this.optionalRpc<unknown>('packageAssignments', token)
+    if (data === undefined) return undefined
+    const list = Array.isArray(data)
+      ? data
+      : data &&
+          typeof data === 'object' &&
+          Array.isArray((data as { assignments?: unknown }).assignments)
+        ? (data as { assignments: unknown[] }).assignments
+        : []
+    return list.filter((a): a is MasterPackageAssignment => !!a && typeof a === 'object')
+  }
+
+  async onlineIps(token: string): Promise<MasterOnlineIp[] | undefined> {
+    const data = await this.optionalRpc<{ ips?: unknown }>('trafficLive', token)
+    if (data === undefined) return undefined
+    const ips = Array.isArray(data?.ips) ? data.ips : []
+    return ips.filter(
+      (x): x is MasterOnlineIp => !!x && typeof x === 'object' && typeof x.ip === 'string' && !!x.ip
+    )
+  }
+
   subscriptionUrl(sub: MasterSubscription, subscriptionToken: string): string {
     const path = sub.subscription_path
     if (path?.startsWith('/x/')) return this.baseUrl + path
@@ -302,6 +377,27 @@ export function parseSubscriptionUserInfo(header: string): SubscriptionUserInfo 
     total: out.total ?? 0,
     ...(out.expire !== undefined && out.expire < 4102444799 ? { expire: out.expire } : {})
   }
+}
+
+/** 套餐订阅的 assignment_id（从 subscription_path 读取） */
+export function assignmentIdOf(sub: MasterSubscription): number | undefined {
+  const m = /[?&]assignment_id=(\d+)/.exec(sub.subscription_path ?? '')
+  return m ? Number(m[1]) : undefined
+}
+
+/** 每月流量重置日：优先当前套餐的指派，否则取第一个会重置的指派。 */
+export function pickResetDay(
+  assignments: MasterPackageAssignment[],
+  sub: MasterSubscription
+): number | undefined {
+  const valid = (a: MasterPackageAssignment): boolean => {
+    const day = a.reset_day ?? 0
+    return !!a.is_reset && Number.isInteger(day) && day >= 1 && day <= 31
+  }
+  const id = assignmentIdOf(sub)
+  const own = id === undefined ? undefined : assignments.find((a) => a.id === id)
+  if (own) return valid(own) ? own.reset_day : undefined
+  return assignments.find(valid)?.reset_day
 }
 
 /** 选择用户“绑定的配置”：优先合并订阅，其次第一个套餐，最后第一个订阅。 */

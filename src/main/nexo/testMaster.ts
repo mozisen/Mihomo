@@ -19,6 +19,8 @@ export interface TestMasterOptions {
   userInfoHeader?: string
   /** 模拟主控不允许普通用户创建个人 API 令牌 */
   apiTokensDisabled?: boolean
+  /** 额外的 /user/* 接口：路径 → [状态码, 响应体] */
+  extraRoutes?: Record<string, [number, unknown]>
 }
 
 export interface TestMaster {
@@ -128,6 +130,8 @@ export function createTestMaster(opts: TestMasterOptions = {}): TestMaster {
         }
       ]
     }
+    const extra = opts.extraRoutes?.[path]
+    if (extra) return extra
     const del = /^\/user\/api-tokens\/(\d+)$/.exec(path)
     if (del && method === 'DELETE') {
       for (const [k, v] of apiTokens) if (v.id === Number(del[1])) apiTokens.delete(k)
