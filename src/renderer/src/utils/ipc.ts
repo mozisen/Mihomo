@@ -6,6 +6,7 @@ import type {
   TrafficUsageImportBatch,
   TrafficUsageOverview
 } from '../../../shared/trafficUsage'
+import type { NexoAccountState } from '../../../shared/nexo'
 
 function checkIpcError<T>(response: unknown): T {
   if (response && typeof response === 'object' && 'invokeError' in response) {
@@ -21,6 +22,13 @@ async function invoke<T>(channel: string, ...args: unknown[]): Promise<T> {
 
 // IPC API 类型定义
 interface IpcApi {
+  // NEXO account
+  nexoGetAccountState: () => Promise<NexoAccountState>
+  nexoLogin: (username: string, password: string) => Promise<NexoAccountState>
+  nexoLogin2fa: (code: string) => Promise<NexoAccountState>
+  nexoCancel2fa: () => Promise<void>
+  nexoLogout: () => Promise<void>
+  nexoRefresh: () => Promise<NexoAccountState>
   // Mihomo API
   mihomoVersion: () => Promise<IMihomoVersion>
   mihomoCloseConnection: (id: string) => Promise<void>
@@ -279,6 +287,13 @@ const ipc = new Proxy({} as IpcApi, {
 
 // 导出所有 IPC 方法
 export const {
+  // NEXO account
+  nexoGetAccountState,
+  nexoLogin,
+  nexoLogin2fa,
+  nexoCancel2fa,
+  nexoLogout,
+  nexoRefresh,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,

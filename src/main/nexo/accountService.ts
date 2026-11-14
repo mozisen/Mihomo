@@ -7,6 +7,9 @@ import {
   type MasterSubscription,
   type SubscriptionUserInfo
 } from './client'
+import type { NexoAccountInfo, NexoAccountState } from '../../shared/nexo'
+
+export type { NexoAccountInfo, NexoAccountState }
 
 /** 加密保存在本机的会话（长期有效的个人 API 令牌，退出登录时吊销）。 */
 export interface NexoSession {
@@ -15,33 +18,6 @@ export interface NexoSession {
   tokenName: string
   account?: NexoAccountInfo
 }
-
-export interface NexoAccountInfo {
-  username: string
-  nickname?: string
-  email?: string
-  subscriptionName?: string
-  trafficUsed?: number
-  trafficTotal?: number
-  /** Unix 秒；没有到期日时为空 */
-  expire?: number
-  /** 每月流量重置日（1–31）；主控暂未提供时为空 */
-  resetDay?: number
-  /** 当前在线 IP；主控暂未提供时为空 */
-  onlineIps?: string[]
-  lastSync?: number
-}
-
-export type NexoAccountState =
-  | { status: 'loading' }
-  | { status: 'loggedOut'; error?: string }
-  | { status: 'needs2fa' }
-  | {
-      status: 'loggedIn'
-      account: NexoAccountInfo
-      syncing: boolean
-      error?: string
-    }
 
 export interface NexoAccountDeps {
   client: MasterClient

@@ -2,6 +2,12 @@ import { contextBridge, ipcRenderer, webUtils } from 'electron'
 
 // 允许的 invoke channels 白名单
 const validInvokeChannels = [
+  'nexoGetAccountState',
+  'nexoLogin',
+  'nexoLogin2fa',
+  'nexoCancel2fa',
+  'nexoLogout',
+  'nexoRefresh',
   // Mihomo API
   'mihomoVersion',
   'mihomoCloseConnection',
@@ -213,6 +219,7 @@ const validListenChannels = [
   'core-started',
   'updateDownloadProgress',
   'pluginConfigUpdated',
+  'nexoAccountChanged',
   'openPluginFile',
   'dnsOverrideAutoDisabled'
 ] as const
