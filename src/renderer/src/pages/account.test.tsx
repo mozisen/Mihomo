@@ -10,7 +10,12 @@ import Account, { validateLoginForm } from './account'
 
 const account: { state: NexoAccountState } = { state: { status: 'loggedOut' } }
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }))
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: { count?: number }) =>
+      opts?.count === undefined ? key : `${key}:${opts.count}`
+  })
+}))
 vi.mock('@renderer/components/base/nexo-logo', () => ({ default: () => <img alt="NEXO" /> }))
 vi.mock('@renderer/components/base/base-page', () => ({
   default: (props: { title?: React.ReactNode; children?: React.ReactNode }) => (
@@ -28,7 +33,8 @@ vi.mock('@renderer/utils/ipc', () => ({
   nexoLogin2fa: vi.fn(),
   nexoCancel2fa: vi.fn(),
   nexoLogout: vi.fn(),
-  nexoRefresh: vi.fn()
+  nexoRefresh: vi.fn(),
+  nexoRefreshOnline: vi.fn()
 }))
 
 const GB = 1024 ** 3
@@ -112,6 +118,18 @@ describe('Account page', () => {
     expect(html).toContain('account.action.updateConfig')
     expect(html).toContain('account.action.logout')
     expect(html).not.toContain('name="password"')
+  })
+
+  it('shows the online IP count and connection count on two lines', () => {
+    account.state = {
+      status: 'loggedIn',
+      syncing: false,
+      account: { username: 'alice', online: { ips: 1, conns: 16 } }
+    }
+    const html = renderToStaticMarkup(<Account />)
+    expect(html).toMatch(/data-testid="online-ips">account\.info\.onlineIps:1</)
+    expect(html).toMatch(/data-testid="online-conns">account\.info\.onlineConns:16</)
+    expect(html).not.toContain('1.2.3.4')
   })
 
   it('shows progress while the config is updating and a sync error', () => {

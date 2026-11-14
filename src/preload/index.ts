@@ -8,6 +8,7 @@ const validInvokeChannels = [
   'nexoCancel2fa',
   'nexoLogout',
   'nexoRefresh',
+  'nexoRefreshOnline',
   // Mihomo API
   'mihomoVersion',
   'mihomoCloseConnection',

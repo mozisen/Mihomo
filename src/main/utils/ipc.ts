@@ -78,7 +78,8 @@ import {
   nexoLogin,
   nexoLogin2fa,
   nexoLogout,
-  nexoRefresh
+  nexoRefresh,
+  nexoRefreshOnline
 } from '../nexo/account'
 import { guardNexoHandlers } from '../nexo/ipcGuard'
 import {
@@ -191,6 +192,7 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   nexoCancel2fa,
   nexoLogout,
   nexoRefresh,
+  nexoRefreshOnline,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,

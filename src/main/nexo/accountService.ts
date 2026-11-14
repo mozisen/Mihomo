@@ -6,6 +6,7 @@ import {
   pickSubscription,
   type LoginSuccess,
   type MasterClient,
+  type MasterOnlineIp,
   type MasterSubscription,
   type SubscriptionUserInfo
 } from './client'
@@ -165,7 +166,7 @@ export class NexoAccountService {
       // 会话可能已在下载期间被退出登录：不能再把订阅写回去
       if (this.session !== session) return
       await this.deps.applyProfile(downloaded.content, {
-        name: sub.name || 'NEXO',
+        name: sub.name || 'nexo',
         userInfo: downloaded.userInfo
       })
       const extras = await this.fetchExtras(session.apiToken, sub)
@@ -197,6 +198,26 @@ export class NexoAccountService {
     }
   }
 
+  /**
+   * 只刷新在线 IP 数与连接数（账户页每 10 秒调用一次）。不下载订阅、不写会话文件；
+   * 主控没有这个接口时不发请求，出错时保持原值。
+   */
+  async refreshOnline(): Promise<void> {
+    const session = this.session
+    if (!session || this.syncPromise) return
+    let ips
+    try {
+      ips = await this.deps.client.onlineIps(session.apiToken)
+    } catch (e) {
+      this.deps.log?.warn('NEXO online refresh failed', e)
+      return
+    }
+    if (!ips || this.session !== session || this.state.status !== 'loggedIn') return
+    const account = { ...this.state.account, online: summarizeOnline(ips) }
+    session.account = account
+    this.setState({ ...this.state, account })
+  }
+
   /** 重置日与在线 IP 走猜测路径的可选接口：拿不到就留空，绝不影响登录与订阅。 */
   private async fetchExtras(
     token: string,
@@ -213,11 +234,7 @@ export class NexoAccountService {
       if (day) out.resetDay = day
     }
     if (ips.status === 'fulfilled' && ips.value) {
-      const conns = ips.value.reduce(
-        (n, x) => n + (Number.isFinite(x.conns) ? Math.max(0, Number(x.conns)) : 0),
-        0
-      )
-      out.online = { ips: new Set(ips.value.map((x) => x.ip)).size, conns }
+      out.online = summarizeOnline(ips.value)
     }
     for (const [name, r] of [
       ['packageAssignments', assignments],
@@ -243,6 +260,14 @@ export class NexoAccountService {
     await this.deps.removeProfile()
     this.setState({ status: 'loggedOut', ...(opts.error ? { error: opts.error } : {}) })
   }
+}
+
+export function summarizeOnline(ips: MasterOnlineIp[]): { ips: number; conns: number } {
+  const conns = ips.reduce(
+    (n, x) => n + (Number.isFinite(x.conns) ? Math.max(0, Number(x.conns)) : 0),
+    0
+  )
+  return { ips: new Set(ips.map((x) => x.ip)).size, conns }
 }
 
 function toUnix(iso?: string | null): number | undefined {

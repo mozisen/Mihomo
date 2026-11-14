@@ -1,12 +1,12 @@
 import { Button, Card, CardBody, Chip, Divider, Progress } from '@heroui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoLogOutOutline, IoPersonCircle, IoRefresh } from 'react-icons/io5'
 import BasePage from '@renderer/components/base/base-page'
 import BaseConfirmModal from '@renderer/components/base/base-confirm-modal'
 import LoginPanel from '@renderer/components/nexo/login-panel'
 import { useNexoAccount } from '@renderer/hooks/use-nexo-account'
-import { nexoLogout, nexoRefresh } from '@renderer/utils/ipc'
+import { nexoLogout, nexoRefresh, nexoRefreshOnline } from '@renderer/utils/ipc'
 import { buildAccountView } from '@renderer/utils/nexo-account'
 import { nexoErrorCode, nexoErrorDetail, type NexoAccountInfo } from '../../../shared/nexo'
 
@@ -20,7 +20,10 @@ function formatTime(ms?: number): string | undefined {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-const InfoRow: React.FC<{ label: string; value?: string; testId: string }> = ({
+/** 账户页打开期间在线 IP 数与连接数的刷新间隔 */
+export const ONLINE_REFRESH_MS = 10_000
+
+const InfoRow: React.FC<{ label: string; value?: React.ReactNode; testId: string }> = ({
   label,
   value,
   testId
@@ -48,6 +51,16 @@ export const AccountDetails: React.FC<{
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const view = buildAccountView(account)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return
+      void nexoRefreshOnline()
+        .catch(() => {})
+        .finally(() => void mutate())
+    }, ONLINE_REFRESH_MS)
+    return (): void => window.clearInterval(timer)
+  }, [mutate])
   const shownError = refreshError || (error ? t('account.error.syncFailed') : '')
   const shownDetail = refreshError ? refreshDetail : error
 
@@ -145,12 +158,16 @@ export const AccountDetails: React.FC<{
             testId="info-ip"
             label={t('account.info.online')}
             value={
-              view.online
-                ? t('account.info.onlineValue', {
-                    ips: view.online.ips,
-                    conns: view.online.conns
-                  })
-                : undefined
+              view.online ? (
+                <span className="flex flex-col items-end leading-5">
+                  <span data-testid="online-ips">
+                    {t('account.info.onlineIps', { count: view.online.ips })}
+                  </span>
+                  <span data-testid="online-conns">
+                    {t('account.info.onlineConns', { count: view.online.conns })}
+                  </span>
+                </span>
+              ) : undefined
             }
           />
           <Divider />

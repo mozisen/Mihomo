@@ -321,3 +321,45 @@ describe('optional account details', () => {
     expect(account?.resetDay).toBeUndefined()
   })
 })
+
+describe('online refresh', () => {
+  it('updates only the online counts without downloading the subscription', async () => {
+    const live: [number, unknown] = [200, { ips: [{ ip: '1.1.1.1', conns: 2 }] }]
+    const ctx = setup({ extraRoutes: { '/user/traffic/live': live } })
+    await ctx.service.init()
+    await ctx.service.login('alice', 'secret')
+    live[1] = {
+      ips: [
+        { ip: '1.1.1.1', conns: 10 },
+        { ip: '2.2.2.2', conns: 6 }
+      ]
+    }
+    ctx.master.calls.length = 0
+    await ctx.service.refreshOnline()
+    expect(ctx.master.calls).toEqual(['GET /user/traffic/live'])
+    const s = ctx.service.getState()
+    expect(s.status === 'loggedIn' && s.account.online).toEqual({ ips: 2, conns: 16 })
+  })
+
+  it('sends nothing when the master has no live endpoint or nobody is logged in', async () => {
+    const ctx = setup({})
+    await ctx.service.init()
+    await ctx.service.refreshOnline()
+    await ctx.service.login('alice', 'secret')
+    ctx.master.calls.length = 0
+    await ctx.service.refreshOnline()
+    expect(ctx.master.calls).toEqual([])
+  })
+
+  it('keeps the last counts when a refresh fails', async () => {
+    const live: [number, unknown] = [200, { ips: [{ ip: '1.1.1.1', conns: 3 }] }]
+    const ctx = setup({ extraRoutes: { '/user/traffic/live': live } })
+    await ctx.service.init()
+    await ctx.service.login('alice', 'secret')
+    live[0] = 500
+    await ctx.service.refreshOnline()
+    const s = ctx.service.getState()
+    expect(s.status).toBe('loggedIn')
+    expect(s.status === 'loggedIn' && s.account.online).toEqual({ ips: 1, conns: 3 })
+  })
+})

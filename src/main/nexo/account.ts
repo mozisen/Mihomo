@@ -128,6 +128,11 @@ export async function nexoRefresh(): Promise<NexoAccountState> {
   return nexoAccount().getState()
 }
 
+export async function nexoRefreshOnline(): Promise<NexoAccountState> {
+  await nexoAccount().refreshOnline()
+  return nexoAccount().getState()
+}
+
 // ---- 订阅内容保护 ----
 
 async function isNexoActive(): Promise<boolean> {

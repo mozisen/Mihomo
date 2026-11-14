@@ -29,6 +29,7 @@ interface IpcApi {
   nexoCancel2fa: () => Promise<void>
   nexoLogout: () => Promise<void>
   nexoRefresh: () => Promise<NexoAccountState>
+  nexoRefreshOnline: () => Promise<NexoAccountState>
   // Mihomo API
   mihomoVersion: () => Promise<IMihomoVersion>
   mihomoCloseConnection: (id: string) => Promise<void>
@@ -178,6 +179,7 @@ export const {
   nexoCancel2fa,
   nexoLogout,
   nexoRefresh,
+  nexoRefreshOnline,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,
