@@ -23,7 +23,7 @@ vi.mock('../utils/logger', () => ({
 const items = [
   { id: 'sub', type: 'remote', name: 'Sub' },
   { id: 'local', type: 'local', name: 'Local' },
-  { id: 'plugin', type: 'local', name: 'Plugin', pluginId: 'p' }
+  { id: 'nexo', type: 'local', name: 'NEXO', nexo: true }
 ]
 const customDns = { dns: { 'proxy-server-nameserver': ['https://1.1.1.1/dns-query'] } }
 
@@ -48,12 +48,12 @@ describe('localSwitchNeedsDnsConfirm', () => {
   it('only guards switches into a local profile', async () => {
     mocks.getProfileConfig.mockResolvedValue({ current: 'local', items })
     await expect(localSwitchNeedsDnsConfirm('sub')).resolves.toBe(false)
-    await expect(localSwitchNeedsDnsConfirm('plugin')).resolves.toBe(false)
+    await expect(localSwitchNeedsDnsConfirm('nexo')).resolves.toBe(false)
     expect(mocks.getProfile).not.toHaveBeenCalled()
   })
 
-  it('checks plugin profiles like subscriptions', async () => {
-    mocks.getProfileConfig.mockResolvedValue({ current: 'plugin', items })
+  it('checks the NEXO subscription like other subscriptions', async () => {
+    mocks.getProfileConfig.mockResolvedValue({ current: 'nexo', items })
     await expect(localSwitchNeedsDnsConfirm('local')).resolves.toBe(true)
   })
 

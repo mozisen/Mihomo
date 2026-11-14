@@ -3,8 +3,10 @@ export type LocalObject = Record<string, unknown>
 export const LOCAL_PROFILE_ID = 'local'
 export const LEGACY_SIMPLE_PROFILE_ID = 'simple-mode'
 
-export function isLocalProfile(item?: { id?: string; type?: string; pluginId?: string }): boolean {
-  return item?.type === 'local' && item.id !== 'default' && !item.pluginId
+// 本地编辑模式的配置。NEXO 账户订阅虽然也以 type: 'local' 存储（内容加密），
+// 但它是完整的订阅配置，必须按原样运行，不能走本地编译流程。
+export function isLocalProfile(item?: { id?: string; type?: string; nexo?: boolean }): boolean {
+  return item?.type === 'local' && item.id !== 'default' && !item.nexo
 }
 
 export const LOCAL_BUILTIN_OUTBOUNDS: readonly string[] = [
