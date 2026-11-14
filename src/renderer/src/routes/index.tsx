@@ -9,13 +9,11 @@ import {
   Mihomo,
   NetworkPageComponent,
   Override,
-  Profiles,
   Proxies,
   Resources,
   Rules,
   Settings,
   Sniffer,
-  SubStore,
   Sysproxy,
   Traffic,
   Tun
@@ -85,16 +83,8 @@ const routes = [
     element: <Account />
   },
   {
-    path: '/profiles',
-    element: <Profiles />
-  },
-  {
     path: '/settings',
     element: <Settings />
-  },
-  {
-    path: '/substore',
-    element: <SubStore />
   },
   {
     path: '/traffic',

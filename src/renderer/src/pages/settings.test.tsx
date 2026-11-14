@@ -22,7 +22,6 @@ vi.mock('@renderer/components/settings/mihomo-config', () => ({ default: () => n
 vi.mock('@renderer/components/settings/actions', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/shortcut-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/sider-config', () => ({ default: () => null }))
-vi.mock('@renderer/components/settings/substore-config', () => ({ default: () => null }))
 vi.mock('@renderer/components/settings/local-backup-config', () => ({ default: () => null }))
 
 describe('Settings page', () => {

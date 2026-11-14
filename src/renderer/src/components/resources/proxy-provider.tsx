@@ -21,7 +21,7 @@ import { FaPlus } from 'react-icons/fa6'
 import ProviderModal from '../local/provider-modal'
 import SettingItem from '../base/base-setting-item'
 import SettingCard from '../base/base-setting-card'
-import QrCodeModal from '../profiles/qr-code-modal'
+import QrCodeModal from './qr-code-modal'
 import Viewer from './viewer'
 /* eslint-disable react/prop-types */
 const ProxyProvider: React.FC<{ editing?: boolean }> = ({ editing: editingProp }) => {

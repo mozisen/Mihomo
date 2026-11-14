@@ -33,11 +33,7 @@ vi.mock('sysproxy-rs', () => ({
 }))
 
 vi.mock('../resolve/server', () => ({
-  startPacServer: vi.fn(),
-  startSubStoreBackendServer: vi.fn(),
-  startSubStoreFrontendServer: vi.fn(),
-  subStorePort: () => 0,
-  subStoreFrontendPort: () => 0
+  startPacServer: vi.fn()
 }))
 
 vi.mock('../sys/sysproxy', () => ({ triggerSysProxy: vi.fn() }))
@@ -71,7 +67,6 @@ function seedLegacyData(): void {
           useProxy: false,
           allowFixedInterval: false,
           autoUpdate: false,
-          substore: false,
           updated: 1
         }
       ]

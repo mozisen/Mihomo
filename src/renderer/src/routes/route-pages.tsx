@@ -7,7 +7,6 @@ const OverridePage = createPreloadablePage(() => import('@renderer/pages/overrid
 const ProxiesPage = createPreloadablePage(() => import('@renderer/pages/proxies'))
 const RulesPage = createPreloadablePage(() => import('@renderer/pages/rules'))
 const SettingsPage = createPreloadablePage(() => import('@renderer/pages/settings'))
-const ProfilesPage = createPreloadablePage(() => import('@renderer/pages/profiles'))
 const AccountPage = createPreloadablePage(() => import('@renderer/pages/account'))
 const LogsPage = createPreloadablePage(() => import('@renderer/pages/logs'))
 const ConnectionsPage = createPreloadablePage(() => import('@renderer/pages/connections'))
@@ -17,7 +16,6 @@ const TunPage = createPreloadablePage(() => import('@renderer/pages/tun'))
 const ResourcesPage = createPreloadablePage(() => import('@renderer/pages/resources'))
 const DNSPage = createPreloadablePage(() => import('@renderer/pages/dns'))
 const SnifferPage = createPreloadablePage(() => import('@renderer/pages/sniffer'))
-const SubStorePage = createPreloadablePage(() => import('@renderer/pages/substore'))
 const TrafficPage = createPreloadablePage(() => import('@renderer/pages/traffic'))
 
 export const NetworkPageComponent = NetworkPage.Page
@@ -25,7 +23,6 @@ export const Override = OverridePage.Page
 export const Proxies = ProxiesPage.Page
 export const Rules = RulesPage.Page
 export const Settings = SettingsPage.Page
-export const Profiles = ProfilesPage.Page
 export const Account = AccountPage.Page
 export const Logs = LogsPage.Page
 export const Connections = ConnectionsPage.Page
@@ -35,7 +32,6 @@ export const Tun = TunPage.Page
 export const Resources = ResourcesPage.Page
 export const DNS = DNSPage.Page
 export const Sniffer = SnifferPage.Page
-export const SubStore = SubStorePage.Page
 export const Traffic = TrafficPage.Page
 
 // 默认落地页立即预加载，避免首屏等待 chunk 下载。
@@ -44,7 +40,6 @@ void ProxiesPage.preload().catch(() => {})
 const remainingPageLoaders: Array<() => Promise<unknown>> = [
   SettingsPage.preload,
   AccountPage.preload,
-  ProfilesPage.preload,
   ConnectionsPage.preload,
   RulesPage.preload,
   MihomoPage.preload,
@@ -55,7 +50,6 @@ const remainingPageLoaders: Array<() => Promise<unknown>> = [
   ResourcesPage.preload,
   OverridePage.preload,
   LogsPage.preload,
-  SubStorePage.preload,
   NetworkPage.preload,
   TrafficPage.preload
 ]

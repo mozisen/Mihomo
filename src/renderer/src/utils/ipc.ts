@@ -85,13 +85,7 @@ interface IpcApi {
   getProfileImportInfo: (
     item: Pick<
       IProfileItem,
-      | 'url'
-      | 'useProxy'
-      | 'userAgent'
-      | 'authToken'
-      | 'substore'
-      | 'allowFixedInterval'
-      | 'updateTimeout'
+      'url' | 'useProxy' | 'userAgent' | 'authToken' | 'allowFixedInterval' | 'updateTimeout'
     >
   ) => Promise<Partial<IProfileItem>>
   setProfileStr: (id: string, str: string) => Promise<void>
@@ -220,20 +214,6 @@ interface IpcApi {
   reinitWebdavBackupScheduler: () => Promise<void>
   exportLocalBackup: () => Promise<boolean>
   importLocalBackup: () => Promise<boolean>
-  // SubStore
-  startSubStoreFrontendServer: () => Promise<void>
-  stopSubStoreFrontendServer: () => Promise<void>
-  startSubStoreBackendServer: () => Promise<void>
-  stopSubStoreBackendServer: () => Promise<void>
-  ensureSubStoreServices: () => Promise<{
-    backendPort?: number
-    frontendPort?: number
-  }>
-  downloadSubStore: () => Promise<void>
-  subStorePort: () => Promise<number>
-  subStoreFrontendPort: () => Promise<number>
-  subStoreSubs: () => Promise<ISubStoreSub[]>
-  subStoreCollections: () => Promise<ISubStoreSub[]>
   // Theme
   resolveThemes: () => Promise<{ key: string; label: string; content: string }[]>
   fetchThemes: () => Promise<void>
@@ -426,17 +406,6 @@ export const {
   reinitWebdavBackupScheduler,
   exportLocalBackup,
   importLocalBackup,
-  // SubStore
-  startSubStoreFrontendServer,
-  stopSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreBackendServer,
-  ensureSubStoreServices,
-  downloadSubStore,
-  subStorePort,
-  subStoreFrontendPort,
-  subStoreSubs,
-  subStoreCollections,
   // Theme
   resolveThemes,
   fetchThemes,

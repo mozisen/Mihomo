@@ -23,7 +23,6 @@ import ConnCard from '@renderer/components/sider/conn-card'
 import LogCard from '@renderer/components/sider/log-card'
 import MihomoCoreCard from '@renderer/components/sider/mihomo-core-card'
 import ResourceCard from '@renderer/components/sider/resource-card'
-import SubStoreCard from '@renderer/components/sider/substore-card'
 import NetworkCard from '@renderer/components/sider/network-card'
 import UsageCard from '@renderer/components/sider/usage-card'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
@@ -44,7 +43,6 @@ const componentMap: Record<SiderCardKey, React.FC<{ iconOnly?: boolean; expanded
   rule: RuleCard,
   resource: ResourceCard,
   override: OverrideCard,
-  substore: SubStoreCard,
   network: NetworkCard,
   usage: UsageCard
 }

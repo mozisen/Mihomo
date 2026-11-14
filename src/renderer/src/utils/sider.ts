@@ -1,7 +1,7 @@
 import { DEFAULT_SIDER_ORDER } from '../../../shared/appConfig'
 
 // NEXO 定制：这些卡片在侧边栏和“侧边栏设置”中都不显示，对应页面不再有入口。
-export const HIDDEN_SIDER_CARDS: readonly SiderCardKey[] = ['override', 'dns', 'sniff', 'substore']
+export const HIDDEN_SIDER_CARDS: readonly SiderCardKey[] = ['override', 'dns', 'sniff']
 
 export function isSiderCardHidden(key: string): boolean {
   return HIDDEN_SIDER_CARDS.includes(key as SiderCardKey)
@@ -24,7 +24,6 @@ export const SIDER_CARD_ROUTES: Record<SiderCardKey, string> = {
   dns: '/dns',
   sniff: '/sniffer',
   log: '/logs',
-  substore: '/substore',
   network: '/network',
   usage: '/traffic'
 }

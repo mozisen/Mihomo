@@ -57,15 +57,6 @@ import {
   convertMrsRuleset
 } from '../config'
 import {
-  startSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreFrontendServer,
-  stopSubStoreBackendServer,
-  downloadSubStore,
-  subStoreFrontendPort,
-  subStorePort
-} from '../resolve/server'
-import {
   quitWithoutCore,
   restartCore,
   checkTunPermissions,
@@ -136,7 +127,6 @@ import {
   resolveThemes,
   writeTheme
 } from '../resolve/theme'
-import { subStoreCollections, subStoreSubs } from '../core/subStoreApi'
 import { exportGistAgeSecretKey, generateGistAgeKeyPair, getGistUrl } from '../resolve/gistApi'
 import { startMonitor } from '../resolve/trafficMonitor'
 import { closeFloatingWindow, showContextMenu, showFloatingWindow } from '../resolve/floatingWindow'
@@ -183,7 +173,6 @@ import { getAppInfo } from './app-info'
 import { logDir, rulePath } from './dirs'
 import { installMihomoCore, getGitHubTags, clearVersionCache } from './github'
 import { atomicWriteFile } from './safeFile'
-import { startSubStoreServices } from './init'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AsyncFn = (...args: any[]) => Promise<any>
@@ -407,15 +396,6 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   reinitWebdavBackupScheduler: reinitScheduler,
   exportLocalBackup,
   importLocalBackup,
-  // SubStore
-  startSubStoreFrontendServer,
-  stopSubStoreFrontendServer,
-  startSubStoreBackendServer,
-  stopSubStoreBackendServer,
-  ensureSubStoreServices: startSubStoreServices,
-  downloadSubStore,
-  subStoreSubs,
-  subStoreCollections,
   // Theme
   resolveThemes,
   fetchThemes,
@@ -465,8 +445,6 @@ const syncHandlers: Record<string, SyncFn> = {
   setNativeTheme,
   getVersion: () => app.getVersion(),
   platform: () => process.platform,
-  subStorePort: () => subStorePort,
-  subStoreFrontendPort: () => subStoreFrontendPort,
   updateTrayIconImmediate,
   showMainWindow,
   closeMainWindow,

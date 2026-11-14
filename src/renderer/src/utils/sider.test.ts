@@ -9,10 +9,10 @@ import {
   mergeSiderOrder
 } from './sider'
 
-const hidden = ['override', 'dns', 'sniff', 'substore'] as const
+const hidden = ['override', 'dns', 'sniff'] as const
 
 describe('hidden sider cards', () => {
-  it('hides override, DNS override, sniffer override and Sub-Store', () => {
+  it('hides override, DNS override and sniffer override', () => {
     expect([...HIDDEN_SIDER_CARDS].sort()).toEqual([...hidden].sort())
     for (const key of hidden) {
       expect(isSiderCardHidden(key)).toBe(true)

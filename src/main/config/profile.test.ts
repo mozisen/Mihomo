@@ -101,7 +101,6 @@ vi.mock('../utils/logger', () => ({
     error: vi.fn()
   })
 }))
-vi.mock('../resolve/server', () => ({ subStorePort: 8299 }))
 vi.mock('../core/mihomoApi', () => ({
   mihomoCloseAllConnections: vi.fn(),
   mihomoHotReloadConfig: mocks.hotReload
@@ -323,7 +322,6 @@ describe('remote profile import metadata', () => {
       getProfileImportInfo({
         url: 'https://example.test/sub',
         useProxy: false,
-        substore: false,
         allowFixedInterval: false
       })
     ).resolves.toMatchObject({
@@ -348,7 +346,6 @@ describe('remote profile import metadata', () => {
       getProfileImportInfo({
         url: 'https://example.test/my-profile.yaml',
         useProxy: false,
-        substore: false,
         allowFixedInterval: false
       })
     ).resolves.toMatchObject({

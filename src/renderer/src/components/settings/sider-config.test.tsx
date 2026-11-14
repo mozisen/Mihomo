@@ -21,7 +21,7 @@ vi.mock('@heroui/react', () => ({
 describe('SiderConfig', () => {
   it('does not offer size settings for hidden sider cards', () => {
     const html = renderToStaticMarkup(<SiderConfig />)
-    for (const key of ['override', 'dns', 'sniff', 'substore']) {
+    for (const key of ['override', 'dns', 'sniff']) {
       expect(html).not.toContain(`data-title="sider.cards.${key}"`)
     }
     expect(html).toContain('data-title="sider.cards.proxies"')
