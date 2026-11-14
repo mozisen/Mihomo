@@ -7,6 +7,7 @@ import { IoSettings } from 'react-icons/io5'
 import routes, { useDeferredRoutePreload } from '@renderer/routes'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
+import { resolveOverlayColors, watchThemeChanges } from '@renderer/utils/titlebar'
 import { platform } from '@renderer/utils/init'
 import { TitleBarOverlayOptions } from 'electron'
 import { useTrafficLogger } from '@renderer/hooks/use-traffic-logger'
@@ -94,11 +95,14 @@ const App: React.FC = () => {
 
   const setTitlebar = useCallback((): void => {
     if (!useWindowFrame && platform !== 'darwin') {
-      const options = { height: 47 } as TitleBarOverlayOptions
       try {
-        options.color = window.getComputedStyle(document.documentElement).backgroundColor
-        options.symbolColor = window.getComputedStyle(document.documentElement).color
-        setTitleBarOverlay(options)
+        const body = document.body ? window.getComputedStyle(document.body) : undefined
+        const colors = resolveOverlayColors(
+          window.getComputedStyle(document.documentElement),
+          body,
+          document.documentElement.classList.contains('dark')
+        )
+        setTitleBarOverlay({ height: 47, ...colors } as TitleBarOverlayOptions)
       } catch {
         // ignore
       }
@@ -150,8 +154,10 @@ const App: React.FC = () => {
   useEffect(() => {
     setNativeTheme(appTheme)
     setTheme(appTheme)
-    setTitlebar()
-  }, [appTheme, systemTheme, setTheme, setTitlebar])
+  }, [appTheme, systemTheme, setTheme])
+
+  // 主题 class 真正落到 html 上之后再给右上角系统按钮区上色
+  useEffect(() => watchThemeChanges(setTitlebar), [setTitlebar])
 
   useEffect(() => {
     window.addEventListener('mouseup', onResizeEnd)
