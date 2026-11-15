@@ -1,5 +1,6 @@
 // NEXO 账户：登录妙妙屋X、保持在线、自动更新绑定的订阅。依赖全部注入，便于单元测试。
 import type { NexoAccountInfo, NexoAccountState } from '../../shared/nexo'
+import { SecureChannelError } from './secureChannel'
 import {
   MasterApiError,
   pickResetDay,
@@ -39,7 +40,19 @@ export interface NexoAccountDeps {
   purgeProfileOffline?: () => Promise<void>
   onChange?: (state: NexoAccountState) => void
   now?: () => number
+  /** 测试用：替换重试前的等待 */
+  sleep?: (ms: number) => Promise<void>
   log?: { info: (msg: string) => void; warn: (msg: string, e?: unknown) => void }
+}
+
+/** 配置更新遇到网络抖动等暂时性错误时的重试间隔（共重试 5 次） */
+export const SYNC_RETRY_DELAYS_MS = [2_000, 4_000, 8_000, 15_000, 30_000]
+
+/** 只重试暂时性错误：连不上主控、主控 5xx / 超时。401、限流、配置无效等直接失败。 */
+export function isTransientError(e: unknown): boolean {
+  if (e instanceof SecureChannelError) return e.code === 'network' || e.code === 'cert_unavailable'
+  if (e instanceof MasterApiError) return e.status === 408 || (e.status >= 500 && e.status !== 501)
+  return false
 }
 
 export class NexoAccountService {
@@ -145,7 +158,28 @@ export class NexoAccountService {
     return this.syncPromise
   }
 
+  /** 暂时性错误自动重试 5 次；期间保持“更新中”，退出登录后立即停止。 */
   private async doSync(): Promise<void> {
+    const session = this.session
+    const sleep = this.deps.sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)))
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.syncOnce(attempt < SYNC_RETRY_DELAYS_MS.length)
+      } catch (e) {
+        const delay = SYNC_RETRY_DELAYS_MS[attempt]
+        if (delay === undefined || !isTransientError(e) || this.session !== session) throw e
+        this.deps.log?.warn(
+          `NEXO subscription sync failed, retry ${attempt + 1}/${SYNC_RETRY_DELAYS_MS.length} in ${delay / 1000}s`,
+          e
+        )
+        await sleep(delay)
+        if (this.session !== session) throw e
+      }
+    }
+  }
+
+  /** @param willRetry 失败后还会重试：暂时性错误先不在账户页报错 */
+  private async syncOnce(willRetry: boolean): Promise<void> {
     const session = this.session
     if (!session) throw new Error('not logged in')
     const { client } = this.deps
@@ -185,6 +219,7 @@ export class NexoAccountService {
         await this.logout({ revoke: false, error: 'SESSION_EXPIRED' })
         throw e
       }
+      if (willRetry && isTransientError(e)) throw e
       if (this.session === session) {
         this.setState({
           status: 'loggedIn',

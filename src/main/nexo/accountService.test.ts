@@ -1,14 +1,29 @@
 import { describe, expect, it, vi } from 'vitest'
-import { NexoAccountService, buildAccountInfo, type NexoSession } from './accountService'
-import { MasterClient } from './client'
+import {
+  NexoAccountService,
+  SYNC_RETRY_DELAYS_MS,
+  buildAccountInfo,
+  isTransientError,
+  type NexoSession
+} from './accountService'
+import { MasterApiError, MasterClient } from './client'
+import { SecureChannelError } from './secureChannel'
 import { createTestMaster } from './testMaster'
 
-function setup(opts: Parameters<typeof createTestMaster>[0] = {}, saved?: NexoSession) {
+type Fetch = ReturnType<typeof createTestMaster>['fetch']
+
+function setup(
+  opts: Parameters<typeof createTestMaster>[0] = {},
+  saved?: NexoSession,
+  wrapFetch: (f: Fetch) => Fetch = (f) => f
+) {
   const master = createTestMaster(opts)
+  const sleeps: number[] = []
+  const hooks: { onSleep?: () => Promise<void> } = {}
   const client = new MasterClient({
     baseUrl: 'https://mx.voee.de',
     userAgent: 'mihomo/1.19.34 NEXO/1.0.0',
-    fetch: master.fetch,
+    fetch: wrapFetch(master.fetch),
     issuerPublicKey: master.issuerPublicKey
   })
   const store: { session?: NexoSession; profile?: string; profileName?: string } = {
@@ -33,9 +48,13 @@ function setup(opts: Parameters<typeof createTestMaster>[0] = {}, saved?: NexoSe
       store.profile = undefined
     },
     onChange: (s) => states.push(s.status),
-    now: () => 1_700_000_000_000
+    now: () => 1_700_000_000_000,
+    sleep: async (ms) => {
+      sleeps.push(ms)
+      await hooks.onSleep?.()
+    }
   })
-  return { master, client, store, states, service }
+  return { master, client, store, states, service, sleeps, hooks }
 }
 
 describe('NexoAccountService', () => {
@@ -361,5 +380,56 @@ describe('online refresh', () => {
     const s = ctx.service.getState()
     expect(s.status).toBe('loggedIn')
     expect(s.status === 'loggedIn' && s.account.online).toEqual({ ips: 1, conns: 3 })
+  })
+})
+
+describe('sync retries', () => {
+  /** 前 n 次订阅下载连不上主控 */
+  const flakyDownloads =
+    (n: number) =>
+    (f: Fetch): Fetch =>
+    async (url, init) => {
+      if (url.includes('/package-subscribe') && n-- > 0) throw new TypeError('fetch failed')
+      return f(url, init)
+    }
+
+  it('retries a network failure and succeeds without showing an error', async () => {
+    const ctx = setup({}, undefined, flakyDownloads(3))
+    await ctx.service.init()
+    await ctx.service.login('alice', 'secret')
+    expect(ctx.sleeps).toEqual(SYNC_RETRY_DELAYS_MS.slice(0, 3))
+    expect(ctx.store.profile).toBeDefined()
+    const s = ctx.service.getState()
+    expect(s.status === 'loggedIn' && s.error).toBeFalsy()
+  })
+
+  it('gives up after 5 retries and reports the error', async () => {
+    const ctx = setup({}, undefined, flakyDownloads(99))
+    await ctx.service.init()
+    await ctx.service.login('alice', 'secret')
+    expect(ctx.sleeps).toEqual(SYNC_RETRY_DELAYS_MS)
+    expect(SYNC_RETRY_DELAYS_MS).toHaveLength(5)
+    const s = ctx.service.getState()
+    expect(s.status === 'loggedIn' && s.error).toMatch(/fetch failed/)
+  })
+
+  it('does not retry errors that will not go away', () => {
+    expect(isTransientError(new MasterApiError('unauthorized', 401))).toBe(false)
+    expect(isTransientError(new MasterApiError('rate limited', 429))).toBe(false)
+    expect(isTransientError(new MasterApiError('not found', 404))).toBe(false)
+    expect(isTransientError(new Error('NO_SUBSCRIPTION'))).toBe(false)
+    expect(isTransientError(new MasterApiError('bad gateway', 502))).toBe(true)
+    expect(isTransientError(new SecureChannelError('down', 'network'))).toBe(true)
+  })
+
+  it('stops retrying once logged out', async () => {
+    const ctx = setup({}, undefined, flakyDownloads(99))
+    await ctx.service.init()
+    // 第一次等待重试时退出登录
+    ctx.hooks.onSleep = () => ctx.service.logout()
+    await ctx.service.login('alice', 'secret')
+    expect(ctx.sleeps).toHaveLength(1)
+    expect(ctx.store.profile).toBeUndefined()
+    expect(ctx.service.getState().status).toBe('loggedOut')
   })
 })
