@@ -75,7 +75,6 @@
   "settings.lightMode": "淺色模式",
   "settings.autoStart": "開機自啟",
   "settings.autoStart.permissions": "正在以管理員權限配置計畫任務，請在 UAC 對話框中點擊'是'...",
-  "settings.autoUpdateProfileOnStart": "啟動時更新訂閱",
   "settings.silentStart": "靜默啟動",
   "settings.autoQuitWithoutCore": "自動進入輕量模式",
   "settings.autoQuitWithoutCoreTooltip": "關閉窗口後指定時間自動進入輕量模式",
@@ -724,5 +723,9 @@
   "update.currentVersion": "目前版本：{{version}}",
   "update.later": "稍後",
   "update.installNow": "立即更新",
-  "update.failedTitle": "更新失敗"
+  "update.failedTitle": "更新失敗",
+  "actions.checkUpdate.title": "檢查更新",
+  "actions.checkUpdate.button": "檢查更新",
+  "actions.checkUpdate.upToDate": "已是最新版本 v{{version}}",
+  "actions.checkUpdate.failed": "檢查更新失敗：{{message}}"
 }

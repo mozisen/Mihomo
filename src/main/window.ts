@@ -9,6 +9,7 @@ import { hideDockIcon, showDockIcon } from './resolve/tray'
 import { dataDir } from './utils/dirs'
 import { mainWindowLogger } from './utils/logger'
 import { atomicWriteFileSync } from './utils/safeFile'
+import { hasNexoSession, shouldShowWindowOnStart } from './nexo/sessionFile'
 import { isHttpUrl } from './utils/url'
 
 interface WindowState {
@@ -216,7 +217,7 @@ async function createWindowInternal(): Promise<void> {
     }
   })
 
-  if (savedState.isMaximized && !silentStart) {
+  if (savedState.isMaximized && !(silentStart && hasNexoSession())) {
     mainWindow.maximize()
   }
 
@@ -246,8 +247,8 @@ async function createWindowInternal(): Promise<void> {
     scheduleQuitWithoutCore(autoQuitWithoutCoreDelay, autoQuitWithoutCoreMode)
   }
 
-  // 开发模式下始终显示窗口
-  if (!silentStart || is.dev) {
+  // 开发模式下始终显示窗口；静默启动只在已登录时生效，否则用户看不到登录页
+  if (shouldShowWindowOnStart({ silentStart, dev: is.dev, loggedIn: hasNexoSession() })) {
     clearQuitTimeout()
     mainWindow.show()
     mainWindow.focusOnWebView()

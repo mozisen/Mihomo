@@ -141,4 +141,25 @@ describe('Updater', () => {
     expect(deps.quit).not.toHaveBeenCalled()
     expect(deps.reportError).toHaveBeenCalledWith('access denied')
   })
+
+  it('reports the result of a manual check and allows checking again', async () => {
+    const up = setup({ manifest: manifest({ version: '1.0.1' }) })
+    await expect(up.updater.checkManually()).resolves.toEqual({
+      status: 'upToDate',
+      version: '1.0.1'
+    })
+    await expect(up.updater.checkManually()).resolves.toMatchObject({ status: 'upToDate' })
+    // 手动检查过就不再自动检查
+    await up.updater.checkOnce()
+    expect(up.calls).toHaveLength(2)
+
+    const down = setup({ status: 502 })
+    await expect(down.updater.checkManually()).resolves.toMatchObject({ status: 'error' })
+
+    const later = setup({ confirm: false })
+    await expect(later.updater.checkManually()).resolves.toEqual({
+      status: 'available',
+      version: '1.0.2'
+    })
+  })
 })

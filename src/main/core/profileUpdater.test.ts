@@ -22,7 +22,7 @@ vi.mock('../utils/logger', () => ({
 describe('initProfileUpdater', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getAppConfig.mockResolvedValue({ autoUpdateProfileOnStart: true })
+    mocks.getAppConfig.mockResolvedValue({})
     mocks.getProfileConfig.mockResolvedValue({
       current: 'default',
       items: [
@@ -50,7 +50,7 @@ describe('initProfileUpdater', () => {
     expect(mocks.addProfileItem).not.toHaveBeenCalled()
   })
 
-  it('skips remote profile updates on startup when disabled', async () => {
+  it('never re-downloads remote profiles on startup (setting removed)', async () => {
     const remoteProfile = {
       id: 'profile-remote',
       type: 'remote',
@@ -58,7 +58,7 @@ describe('initProfileUpdater', () => {
       autoUpdate: true,
       interval: 'invalid cron'
     }
-    mocks.getAppConfig.mockResolvedValue({ autoUpdateProfileOnStart: false })
+    mocks.getAppConfig.mockResolvedValue({ autoUpdateProfileOnStart: true })
     mocks.getProfileConfig.mockResolvedValue({ current: remoteProfile.id, items: [remoteProfile] })
     mocks.getCurrentProfileItem.mockResolvedValue(remoteProfile)
     mocks.getProfileItem.mockResolvedValue(remoteProfile)
@@ -67,23 +67,5 @@ describe('initProfileUpdater', () => {
     await initProfileUpdater()
 
     expect(mocks.addProfileItem).not.toHaveBeenCalled()
-  })
-
-  it('updates remote profiles on startup by default', async () => {
-    const remoteProfile = {
-      id: 'profile-remote',
-      type: 'remote',
-      name: 'Remote',
-      autoUpdate: true,
-      interval: 'invalid cron'
-    }
-    mocks.getProfileConfig.mockResolvedValue({ current: remoteProfile.id, items: [remoteProfile] })
-    mocks.getCurrentProfileItem.mockResolvedValue(remoteProfile)
-    mocks.getProfileItem.mockResolvedValue(remoteProfile)
-
-    const { initProfileUpdater } = await import('./profileUpdater')
-    await initProfileUpdater()
-
-    expect(mocks.addProfileItem).toHaveBeenCalledWith(remoteProfile)
   })
 })

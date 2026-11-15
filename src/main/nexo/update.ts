@@ -3,7 +3,7 @@ import path from 'path'
 import { app, dialog, shell } from 'electron'
 import i18next from 'i18next'
 import { createLogger } from '../utils/logger'
-import { Updater } from './updater'
+import { Updater, type UpdateCheckResult } from './updater'
 
 const logger = createLogger('Updater')
 
@@ -74,4 +74,9 @@ export function scheduleUpdateCheck(): void {
   if (scheduled || !app.isPackaged || process.platform !== 'win32') return
   scheduled = true
   setTimeout(() => void nexoUpdater().checkOnce(), CHECK_DELAY_MS)
+}
+
+/** 设置页“检查更新”按钮。开发环境照样检查（便于验证），但不会自动弹出。 */
+export async function nexoCheckForUpdate(): Promise<UpdateCheckResult> {
+  return await nexoUpdater().checkManually()
 }

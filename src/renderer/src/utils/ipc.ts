@@ -30,6 +30,12 @@ interface IpcApi {
   nexoLogout: () => Promise<void>
   nexoRefresh: () => Promise<NexoAccountState>
   nexoRefreshOnline: () => Promise<NexoAccountState>
+  nexoCheckForUpdate: () => Promise<
+    | { status: 'upToDate'; version: string }
+    | { status: 'available'; version: string }
+    | { status: 'busy' }
+    | { status: 'error'; message: string }
+  >
   // Mihomo API
   mihomoVersion: () => Promise<IMihomoVersion>
   mihomoCloseConnection: (id: string) => Promise<void>
@@ -180,6 +186,7 @@ export const {
   nexoLogout,
   nexoRefresh,
   nexoRefreshOnline,
+  nexoCheckForUpdate,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,

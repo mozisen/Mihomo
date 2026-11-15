@@ -81,6 +81,7 @@ import {
   nexoRefresh,
   nexoRefreshOnline
 } from '../nexo/account'
+import { nexoCheckForUpdate } from '../nexo/update'
 import { guardNexoHandlers } from '../nexo/ipcGuard'
 import {
   localSwitchNeedsDnsConfirm,
@@ -193,6 +194,7 @@ const rawAsyncHandlers: Record<string, AsyncFn> = {
   nexoLogout,
   nexoRefresh,
   nexoRefreshOnline,
+  nexoCheckForUpdate,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,

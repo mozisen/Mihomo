@@ -1,11 +1,5 @@
 import { Cron } from 'croner'
-import {
-  addProfileItem,
-  getAppConfig,
-  getCurrentProfileItem,
-  getProfileConfig,
-  getProfileItem
-} from '../config'
+import { addProfileItem, getCurrentProfileItem, getProfileConfig, getProfileItem } from '../config'
 import { logger } from '../utils/logger'
 
 const intervalPool: Record<string, Cron | NodeJS.Timeout> = {}
@@ -98,35 +92,18 @@ function scheduleDelayedCurrentUpdate(item: IProfileItem): void {
 }
 
 export async function initProfileUpdater(): Promise<void> {
-  const { autoUpdateProfileOnStart = true } = await getAppConfig()
   const { items = [], current } = await getProfileConfig()
   const currentItem = await getCurrentProfileItem()
 
   for (const item of items.filter((i) => i.id !== current)) {
     if (item.type === 'remote' && item.autoUpdate && item.interval) {
       await addProfileUpdater(item)
-
-      if (autoUpdateProfileOnStart) {
-        try {
-          await addProfileItem(item)
-        } catch (e) {
-          await logger.warn(`[ProfileUpdater] Failed to init profile ${item.name}:`, e)
-        }
-      }
     }
   }
 
   if (currentItem?.type === 'remote' && currentItem.autoUpdate && currentItem.interval) {
     const currentId = currentItem.id
     await addProfileUpdater(currentItem)
-
-    if (autoUpdateProfileOnStart) {
-      try {
-        await addProfileItem(currentItem)
-      } catch (e) {
-        await logger.warn(`[ProfileUpdater] Failed to init current profile:`, e)
-      }
-    }
 
     const latestCurrentItem = (await getProfileItem(currentId)) ?? currentItem
     scheduleDelayedCurrentUpdate(latestCurrentItem)

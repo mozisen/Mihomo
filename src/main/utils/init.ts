@@ -23,7 +23,9 @@ import {
   SIDER_CARD_DEFAULT_STATUS
 } from '../../shared/appConfig'
 import { LEGACY_SIMPLE_PROFILE_ID, LOCAL_PROFILE_ID } from '../../shared/local-config'
+import { checkAutoRun, enableAutoRun } from '../sys/autoRun'
 import { stringify } from './yaml'
+import { applyNexoDefaults } from './nexoDefaults'
 import {
   defaultConfig,
   defaultControledMihomoConfig,
@@ -417,6 +419,19 @@ async function migrateLocalMode(): Promise<void> {
   }
 }
 
+// 迁移：nexo 默认设置（开机自启、静默启动、外部资源自动更新），每个版本只套用一次
+async function migrateNexoDefaults(): Promise<void> {
+  await applyNexoDefaults({
+    getAppConfig,
+    patchAppConfig,
+    patchControledMihomoConfig,
+    isPackaged: app.isPackaged,
+    checkAutoRun,
+    enableAutoRun,
+    log: { warn: (m, e) => void initLogger.warn(m, e) }
+  })
+}
+
 async function migration(): Promise<void> {
   await Promise.all([
     migrateAppTheme(),
@@ -426,6 +441,7 @@ async function migration(): Promise<void> {
     migrateRemovePassword(),
     migrateMihomoConfig()
   ])
+  await migrateNexoDefaults()
   await migrateLocalMode()
 }
 

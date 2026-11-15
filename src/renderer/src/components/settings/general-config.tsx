@@ -64,7 +64,7 @@ const GeneralConfig: React.FC = () => {
   const [pendingHardwareAccelValue, setPendingHardwareAccelValue] = useState(false)
   const { setTheme } = useTheme()
   const {
-    silentStart = false,
+    silentStart = true,
     useDockIcon = true,
     showTraffic = false,
     proxyInTray = true,
@@ -87,7 +87,6 @@ const GeneralConfig: React.FC = () => {
     autoQuitWithoutCoreDelay = 60,
     autoQuitWithoutCoreMode = 'core',
     envType = [platform === 'win32' ? 'powershell' : 'bash'],
-    autoUpdateProfileOnStart = true,
     githubProxy = 'auto',
     appTheme = 'system',
     language = 'zh-CN',
@@ -284,15 +283,6 @@ const GeneralConfig: React.FC = () => {
               } finally {
                 mutateEnable()
               }
-            }}
-          />
-        </SettingItem>
-        <SettingItem title={t('settings.autoUpdateProfileOnStart')} divider>
-          <Switch
-            size="sm"
-            isSelected={autoUpdateProfileOnStart}
-            onValueChange={(v) => {
-              patchAppConfig({ autoUpdateProfileOnStart: v })
             }}
           />
         </SettingItem>

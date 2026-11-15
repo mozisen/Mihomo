@@ -22,7 +22,8 @@ export const defaultConfig: IAppConfig = {
   enableSmartOverride: true,
   smartCoreUseLightGBM: false,
   smartCoreCollectData: false,
-  silentStart: false,
+  silentStart: true,
+  nexoDefaultsVersion: 0,
   appTheme: 'system',
   useWindowFrame: false,
   proxyInTray: true,
@@ -45,7 +46,6 @@ export const defaultConfig: IAppConfig = {
   autoQuitWithoutCoreMode: 'core',
   proxyDisplayMode: 'simple',
   proxyDisplayOrder: 'default',
-  autoUpdateProfileOnStart: true,
   autoCloseConnection: true,
   autoCloseConnectionOnlyGroup: false,
   subscriptionTimeout: 30000,
@@ -112,7 +112,7 @@ export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
     'store-selected': true,
     'store-fake-ip': true
   },
-  'geo-auto-update': false,
+  'geo-auto-update': true,
   'geo-update-interval': 24,
   // Smart 内核自带的 LightGBM 模型更新器，默认值与内核一致（关闭 / 72 小时 /
   // 空地址即用内核内置地址）。非 Smart 内核会忽略这几个键。

@@ -75,7 +75,6 @@
   "settings.lightMode": "Light Mode",
   "settings.autoStart": "Auto Start",
   "settings.autoStart.permissions": "Configuring scheduled tasks with administrator privileges, please click 'Yes' in the UAC dialog...",
-  "settings.autoUpdateProfileOnStart": "Update Subscriptions on Startup",
   "settings.silentStart": "Silent Start",
   "settings.autoQuitWithoutCore": "Auto Enable Light Mode",
   "settings.autoQuitWithoutCoreTooltip": "Automatically enter light mode after closing window for specified time",
@@ -724,5 +723,9 @@
   "update.currentVersion": "Current version: {{version}}",
   "update.later": "Later",
   "update.installNow": "Update now",
-  "update.failedTitle": "Update failed"
+  "update.failedTitle": "Update failed",
+  "actions.checkUpdate.title": "Check for updates",
+  "actions.checkUpdate.button": "Check",
+  "actions.checkUpdate.upToDate": "You are on the latest version v{{version}}",
+  "actions.checkUpdate.failed": "Update check failed: {{message}}"
 }

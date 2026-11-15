@@ -72,7 +72,6 @@
   "settings.darkMode": "حالت تاریک",
   "settings.lightMode": "حالت روشن",
   "settings.autoStart": "اجرای خودکار در شروع سیستم",
-  "settings.autoUpdateProfileOnStart": "به‌روزرسانی اشتراک‌ها هنگام اجرا",
   "settings.silentStart": "اجرای بی‌صدا",
   "settings.autoQuitWithoutCore": "ورود خودکار به حالت سبک",
   "settings.autoQuitWithoutCoreTooltip": "ورود خودکار به حالت سبک پس از بستن پنجره برای زمان مشخص",
@@ -701,5 +700,9 @@
   "update.currentVersion": "نسخه فعلی: {{version}}",
   "update.later": "بعداً",
   "update.installNow": "به‌روزرسانی",
-  "update.failedTitle": "به‌روزرسانی ناموفق بود"
+  "update.failedTitle": "به‌روزرسانی ناموفق بود",
+  "actions.checkUpdate.title": "بررسی به‌روزرسانی",
+  "actions.checkUpdate.button": "بررسی",
+  "actions.checkUpdate.upToDate": "آخرین نسخه نصب است v{{version}}",
+  "actions.checkUpdate.failed": "بررسی به‌روزرسانی ناموفق بود: {{message}}"
 }

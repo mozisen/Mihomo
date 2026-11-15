@@ -75,6 +75,13 @@ export function pickUpdate(
   }
 }
 
+/** 一次检查的结果：手动检查时据此提示用户 */
+export type UpdateCheckResult =
+  | { status: 'upToDate'; version: string }
+  | { status: 'available'; version: string }
+  | { status: 'busy' }
+  | { status: 'error'; message: string }
+
 export type UpdateFetch = (url: string, init?: RequestInit) => Promise<Response>
 
 export interface UpdaterDeps {
@@ -126,24 +133,31 @@ export class Updater {
     await this.checkAndPrompt()
   }
 
-  async checkAndPrompt(): Promise<void> {
-    if (this.busy) return
+  /** 设置页“检查更新”：随时可用，也算作本次启动已检查过。 */
+  async checkManually(): Promise<UpdateCheckResult> {
+    this.checked = true
+    return await this.checkAndPrompt()
+  }
+
+  async checkAndPrompt(): Promise<UpdateCheckResult> {
+    if (this.busy) return { status: 'busy' }
     this.busy = true
-    const { log } = this.deps
+    const { log, currentVersion } = this.deps
     try {
       let update: AvailableUpdate | undefined
       try {
         update = await this.check()
       } catch (e) {
         log?.warn('nexo update check failed', e)
-        return
+        return { status: 'error', message: e instanceof Error ? e.message : String(e) }
       }
       if (!update) {
-        log?.info(`nexo is up to date (${this.deps.currentVersion})`)
-        return
+        log?.info(`nexo is up to date (${currentVersion})`)
+        return { status: 'upToDate', version: currentVersion }
       }
       log?.info(`nexo update available: ${update.version}`)
-      if (!(await this.deps.confirm(update))) return
+      if (!(await this.deps.confirm(update)))
+        return { status: 'available', version: update.version }
       try {
         const file = await this.download(update)
         const error = await this.deps.launch(file)
@@ -153,6 +167,7 @@ export class Updater {
         log?.warn('nexo update install failed', e)
         await this.deps.reportError?.(e instanceof Error ? e.message : String(e))
       }
+      return { status: 'available', version: update.version }
     } finally {
       this.busy = false
     }

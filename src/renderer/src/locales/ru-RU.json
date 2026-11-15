@@ -74,7 +74,6 @@
   "settings.darkMode": "Тёмная тема",
   "settings.lightMode": "Светлая тема",
   "settings.autoStart": "Автозапуск",
-  "settings.autoUpdateProfileOnStart": "Обновлять подписки при запуске",
   "settings.silentStart": "Тихий запуск",
   "settings.autoQuitWithoutCore": "Автоматический облегчённый режим",
   "settings.autoQuitWithoutCoreTooltip": "Автоматически переходить в облегчённый режим после закрытия окна",
@@ -707,5 +706,9 @@
   "update.currentVersion": "Текущая версия: {{version}}",
   "update.later": "Позже",
   "update.installNow": "Обновить",
-  "update.failedTitle": "Не удалось обновить"
+  "update.failedTitle": "Не удалось обновить",
+  "actions.checkUpdate.title": "Проверить обновления",
+  "actions.checkUpdate.button": "Проверить",
+  "actions.checkUpdate.upToDate": "Установлена последняя версия v{{version}}",
+  "actions.checkUpdate.failed": "Не удалось проверить обновления: {{message}}"
 }

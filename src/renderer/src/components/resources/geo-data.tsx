@@ -19,7 +19,7 @@ const GeoData: React.FC = () => {
       asn: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb'
     },
     'geodata-mode': geoMode = false,
-    'geo-auto-update': geoAutoUpdate = false,
+    'geo-auto-update': geoAutoUpdate = true,
     'geo-update-interval': geoUpdateInterval = 24
   } = controledMihomoConfig || {}
   const [geoipInput, setGeoIpInput] = useState(geoxUrl.geoip)

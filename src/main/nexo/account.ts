@@ -11,7 +11,7 @@ import {
   removeNexoProfile,
   upsertNexoProfile
 } from '../config/profile'
-import { dataDir, mihomoProfileWorkDir, mihomoWorkDir, profilesDir } from '../utils/dirs'
+import { mihomoProfileWorkDir, mihomoWorkDir, profilesDir } from '../utils/dirs'
 import { createLogger } from '../utils/logger'
 import { atomicWriteFile } from '../utils/safeFile'
 import { getRuntimeConfig } from '../core/factory'
@@ -21,15 +21,14 @@ import { type NexoGuardContext } from './ipcGuard'
 import { errorCode, errorDetail } from './errors'
 import { decryptText, encryptText } from './secretStore'
 import { scheduleUpdateCheck } from './update'
+import { nexoSessionPath } from './sessionFile'
 
 /** 妙妙屋X 主控地址（经 ECHO 反代）。 */
 export const NEXO_MASTER_URL = 'https://mx.voee.de'
 
 const logger = createLogger('NEXO')
 
-function sessionPath(): string {
-  return path.join(dataDir(), 'nexo', 'session.bin')
-}
+const sessionPath = nexoSessionPath
 
 async function notifyRenderer(channel: string, payload?: unknown): Promise<void> {
   const { mainWindow } = await import('../window')

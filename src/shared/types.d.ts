@@ -342,9 +342,10 @@ interface IAppConfig {
   lockSiderCards?: boolean
   siderWidth: number
   appTheme: AppTheme
-  autoUpdateProfileOnStart: boolean
   githubProxy?: string
   silentStart: boolean
+  /** 已套用的 nexo 默认设置版本（见 main/utils/nexoDefaults.ts） */
+  nexoDefaultsVersion?: number
   autoCloseConnection: boolean
   autoCloseConnectionOnlyGroup?: boolean
   sysProxy: ISysProxyConfig
