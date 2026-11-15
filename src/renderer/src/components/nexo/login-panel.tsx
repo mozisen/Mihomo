@@ -93,9 +93,11 @@ const LoginPanel: React.FC = () => {
           <h2 className="text-xl font-bold">
             {t(needs2fa ? 'account.twoFactor.title' : 'account.login.title')}
           </h2>
-          <p className="text-sm text-foreground-500 text-center">
-            {t(needs2fa ? 'account.twoFactor.subtitle' : 'account.login.subtitle')}
-          </p>
+          {needs2fa && (
+            <p className="text-sm text-foreground-500 text-center">
+              {t('account.twoFactor.subtitle')}
+            </p>
+          )}
         </div>
         {needs2fa ? (
           <form className="flex flex-col gap-4" onSubmit={onVerify} noValidate>
@@ -132,7 +134,6 @@ const LoginPanel: React.FC = () => {
               name="username"
               autoComplete="username"
               label={t('account.field.username')}
-              placeholder={t('account.field.usernamePlaceholder')}
               value={form.username}
               onValueChange={update('username')}
               isInvalid={!!errors.username}
@@ -142,7 +143,6 @@ const LoginPanel: React.FC = () => {
               name="password"
               autoComplete="current-password"
               label={t('account.field.password')}
-              placeholder={t('account.field.passwordPlaceholder')}
               type={showPassword ? 'text' : 'password'}
               value={form.password}
               onValueChange={update('password')}
