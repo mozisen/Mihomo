@@ -51,3 +51,19 @@ describe('applyNexoDefaults', () => {
     expect(d.patchAppConfig).toHaveBeenCalled()
   })
 })
+
+describe('startup order (regression: 1.0.2 blank window)', () => {
+  it('never applies the defaults during initBasic, before the core is running', async () => {
+    const { readFileSync } = await import('fs')
+    const { join } = await import('path')
+    const init = readFileSync(join(__dirname, 'init.ts'), 'utf-8')
+    const migration = init.slice(init.indexOf('async function migration()'))
+    const body = migration.slice(0, migration.indexOf('\n}\n'))
+    expect(body).not.toMatch(/NexoDefaults/)
+    const index = readFileSync(join(__dirname, '..', 'index.ts'), 'utf-8')
+    // 只在内核启动成功后的回调里调用
+    expect(index.indexOf('applyNexoDefaultsAfterCoreStart()')).toBeGreaterThan(
+      index.indexOf('startCoreForStartup()')
+    )
+  })
+})

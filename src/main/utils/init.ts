@@ -419,8 +419,10 @@ async function migrateLocalMode(): Promise<void> {
   }
 }
 
-// 迁移：nexo 默认设置（开机自启、静默启动、外部资源自动更新），每个版本只套用一次
-async function migrateNexoDefaults(): Promise<void> {
+// nexo 默认设置（开机自启、静默启动、外部资源自动更新），每个版本只套用一次。
+// 必须在内核启动之后调用：改外部资源设置会热更新内核配置，放在 initBasic（app ready 之前）
+// 会卡在“重启内核”上，IPC 永远注册不了，窗口白屏（1.0.2 的问题）。
+export async function applyNexoDefaultsAfterCoreStart(): Promise<void> {
   await applyNexoDefaults({
     getAppConfig,
     patchAppConfig,
@@ -441,7 +443,6 @@ async function migration(): Promise<void> {
     migrateRemovePassword(),
     migrateMihomoConfig()
   ])
-  await migrateNexoDefaults()
   await migrateLocalMode()
 }
 

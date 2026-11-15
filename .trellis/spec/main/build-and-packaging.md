@@ -30,3 +30,10 @@
   once per launch after the account is logged in (packaged Windows builds only), asks
   with a native dialog, verifies size + SHA-256, opens the installer with
   `shell.openPath` (UAC) and quits. Installers are accepted only from that directory.
+- Never call `patchControledMihomoConfig` (or anything that hot-patches the core) from
+  `initBasic()`/`migration()`: they run before `app.whenReady`, the patch tries to restart
+  the core and startup hangs before IPC handlers are registered — the window stays blank
+  (shipped in 1.0.2). One-off defaults go in `applyNexoDefaultsAfterCoreStart()`.
+- Before publishing, smoke-test the built app: `npx electron-vite build`, run Electron
+  with `--remote-debugging-port`, and check the page text via CDP and that the log has no
+  "No handler registered".

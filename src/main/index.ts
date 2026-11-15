@@ -18,7 +18,7 @@ import {
   initCoreWatcher
 } from './core/manager'
 import { createTray } from './resolve/tray'
-import { init, initBasic, safeShowErrorBox } from './utils/init'
+import { applyNexoDefaultsAfterCoreStart, init, initBasic, safeShowErrorBox } from './utils/init'
 import { initShortcut } from './resolve/shortcut'
 import { initProfileUpdater } from './core/profileUpdater'
 import { initNexoAccount, syncNexoAccountInBackground } from './nexo/account'
@@ -319,6 +319,9 @@ app
           startPromises[0].then(async () => {
             syncNexoAccountInBackground()
             await Promise.allSettled([
+              applyNexoDefaultsAfterCoreStart().catch((e) =>
+                mainLogger.warn('Failed to apply nexo defaults', e)
+              ),
               initProfileUpdater().catch((e) =>
                 mainLogger.warn('Failed to init profile updater', e)
               ),
