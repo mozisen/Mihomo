@@ -701,5 +701,11 @@
   "account.logout.title": "Выход",
   "account.logout.content": "При выходе конфигурация на этом устройстве будет удалена. Чтобы пользоваться ей, нужно снова войти. Выйти?",
   "guide.account.title": "Аккаунт",
-  "guide.account.description": "Здесь можно войти в аккаунт nexo."
+  "guide.account.description": "Здесь можно войти в аккаунт nexo.",
+  "update.availableTitle": "Доступно обновление",
+  "update.availableMessage": "Вышла nexo {{version}}. Обновить сейчас?",
+  "update.currentVersion": "Текущая версия: {{version}}",
+  "update.later": "Позже",
+  "update.installNow": "Обновить",
+  "update.failedTitle": "Не удалось обновить"
 }

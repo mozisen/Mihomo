@@ -718,5 +718,11 @@
   "account.logout.title": "Sign out",
   "account.logout.content": "Signing out deletes the config saved on this device. You will need to sign in again to use it. Sign out?",
   "guide.account.title": "Account",
-  "guide.account.description": "Sign in to your nexo account here."
+  "guide.account.description": "Sign in to your nexo account here.",
+  "update.availableTitle": "Update available",
+  "update.availableMessage": "nexo {{version}} is available. Update now?",
+  "update.currentVersion": "Current version: {{version}}",
+  "update.later": "Later",
+  "update.installNow": "Update now",
+  "update.failedTitle": "Update failed"
 }

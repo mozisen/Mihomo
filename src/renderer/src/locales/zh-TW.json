@@ -718,5 +718,11 @@
   "account.logout.title": "登出",
   "account.logout.content": "登出後將刪除本機保存的設定，需要重新登入才能使用。確定登出嗎？",
   "guide.account.title": "帳戶",
-  "guide.account.description": "在這裡登入您的 nexo 帳戶。"
+  "guide.account.description": "在這裡登入您的 nexo 帳戶。",
+  "update.availableTitle": "發現新版本",
+  "update.availableMessage": "nexo {{version}} 已發布，要立即更新嗎？",
+  "update.currentVersion": "目前版本：{{version}}",
+  "update.later": "稍後",
+  "update.installNow": "立即更新",
+  "update.failedTitle": "更新失敗"
 }

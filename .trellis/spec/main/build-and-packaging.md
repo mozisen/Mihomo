@@ -8,9 +8,25 @@
   `extra/sidecar/`). Bundled geo data is only `country.mmdb`, `geoip.dat`, `geosite.dat`;
   ASN/metadb/BundleMRS are fetched by the core on demand. Three cores ship:
   mihomo, mihomo-alpha, mihomo-smart.
-- `electron-builder.yml`: productName NEXO, appId `com.nexo.app`, artifacts `nexo-*`;
+- `electron-builder.yml`: productName `nexo` (lower case everywhere: install dir, exe,
+  shortcuts, UI), appId `com.nexo.app`, artifacts `nexo-*`;
   no file associations.
 - Windows CI: push `main:smart_core` to `mozisen/Mihomo`, then
   `gh workflow run build-windows.yml -R mozisen/Mihomo --ref smart_core -f arch=x64`;
   artifact "Windows x64" contains setup.exe and portable .7z (users want only setup.exe).
 - Regression guards for packaging decisions: `src/main/brand.test.ts`.
+
+## Releases and auto update
+
+- Every change that reaches the user is a release: bump the patch version in
+  `package.json`, commit, push, build on CI, then publish to ECHO with
+  `scripts/release-echo.sh <artifact dir> "<notes>"`.
+- ECHO (`termark` asset `ECHO`, also reverse-proxies mx.voee.de) serves
+  `https://echo.voee.de/nexo/` from `/srv/nexo-updates/nexo` via
+  `/etc/nginx/conf.d/echo.voee.de.conf`; Let's Encrypt cert renews with certbot.timer.
+- `latest.json`: `{ version, notes, releasedAt, assets: { win32: { x64: { file, sha256, size } } } }`.
+  The script uploads the installer first and swaps `latest.json` last; keeps 3 installers.
+- Client: `src/main/nexo/updater.ts` (pure, tested) + `update.ts` (Electron glue). Checks
+  once per launch after the account is logged in (packaged Windows builds only), asks
+  with a native dialog, verifies size + SHA-256, opens the installer with
+  `shell.openPath` (UAC) and quits. Installers are accepted only from that directory.

@@ -20,6 +20,7 @@ import { MasterClient } from './client'
 import { type NexoGuardContext } from './ipcGuard'
 import { errorCode, errorDetail } from './errors'
 import { decryptText, encryptText } from './secretStore'
+import { scheduleUpdateCheck } from './update'
 
 /** 妙妙屋X 主控地址（经 ECHO 反代）。 */
 export const NEXO_MASTER_URL = 'https://mx.voee.de'
@@ -69,7 +70,11 @@ export function nexoAccount(): NexoAccountService {
         await notifyRenderer('profileConfigUpdated')
       },
       purgeProfileOffline: purgeNexoProfileOffline,
-      onChange: (state) => void notifyRenderer('nexoAccountChanged', state),
+      onChange: (state) => {
+        void notifyRenderer('nexoAccountChanged', state)
+        // 打开软件并登录后检查一次更新
+        if (state.status === 'loggedIn') scheduleUpdateCheck()
+      },
       log: { info: (m) => logger.info(m), warn: (m, e) => logger.warn(m, e) }
     })
   }

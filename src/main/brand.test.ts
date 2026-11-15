@@ -11,7 +11,7 @@ describe('NEXO branding', () => {
     const pkg = JSON.parse(readText('package.json'))
     expect(pkg.name).toBe('nexo')
     expect(pkg.description).toBe('nexo')
-    expect(pkg.version).toBe('1.0.0')
+    expect(pkg.version).toMatch(/^\d+\.\d+\.\d+$/)
   })
 
   it('packages the app as NEXO with nexo-* artifacts', () => {
@@ -63,6 +63,12 @@ describe('NEXO branding', () => {
 })
 
 describe('auto update', () => {
+  it('only updates from the nexo release site on ECHO', () => {
+    const updater = readText('src', 'main', 'nexo', 'updater.ts')
+    expect(updater).toContain("UPDATE_BASE_URL = 'https://echo.voee.de/nexo/'")
+    expect(updater).not.toMatch(/github\.com|clashparty/i)
+  })
+
   it('ships without an updater that could pull upstream releases', () => {
     expect(existsSync(join(root, 'src', 'main', 'resolve', 'autoUpdater.ts'))).toBe(false)
     expect(readText('src', 'preload', 'index.ts')).not.toMatch(

@@ -695,5 +695,11 @@
   "account.logout.title": "خروج",
   "account.logout.content": "با خروج، پیکربندی ذخیره‌شده در این دستگاه حذف می‌شود و برای استفاده باید دوباره وارد شوید. خارج می‌شوید؟",
   "guide.account.title": "حساب کاربری",
-  "guide.account.description": "در اینجا وارد حساب nexo خود شوید."
+  "guide.account.description": "در اینجا وارد حساب nexo خود شوید.",
+  "update.availableTitle": "نسخه جدید موجود است",
+  "update.availableMessage": "nexo {{version}} منتشر شد. اکنون به‌روزرسانی شود؟",
+  "update.currentVersion": "نسخه فعلی: {{version}}",
+  "update.later": "بعداً",
+  "update.installNow": "به‌روزرسانی",
+  "update.failedTitle": "به‌روزرسانی ناموفق بود"
 }
