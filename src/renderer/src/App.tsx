@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { DEFAULT_ENABLE_TRAFFIC_LOGGER } from '../../shared/appConfig'
 import SiderItem from './components/sider/sider-item'
 import NexoLogo from './components/base/nexo-logo'
+import UpdateModal from './components/nexo/update-modal'
 import { getSiderCardByPath } from './utils/sider'
 import { markInitialContentPartReady } from './utils/startup'
 
@@ -302,6 +303,7 @@ const App: React.FC = () => {
           <FirstContentReady />
         </Suspense>
       </div>
+      <UpdateModal />
     </div>
   )
 }

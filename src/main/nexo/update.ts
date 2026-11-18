@@ -1,9 +1,10 @@
-// 自动更新在主进程中的实例：打开软件并登录后检查一次，有新版本时用系统对话框提示。
+// 自动更新在主进程中的实例：打开软件并登录后检查一次，有新版本时用应用内弹窗提示。
 import path from 'path'
-import { app, dialog, shell } from 'electron'
-import i18next from 'i18next'
+import { app, shell } from 'electron'
+import type { UpdatePromptState } from '../../shared/update'
 import { createLogger } from '../utils/logger'
 import { Updater, type UpdateCheckResult } from './updater'
+import { UpdatePrompt } from './updatePrompt'
 
 const logger = createLogger('Updater')
 
@@ -18,6 +19,17 @@ async function window(): Promise<Electron.BrowserWindow | undefined> {
   return mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined
 }
 
+let prompt: UpdatePrompt | undefined
+
+function updatePrompt(): UpdatePrompt {
+  if (!prompt) {
+    prompt = new UpdatePrompt(app.getVersion(), (state) => {
+      void window().then((win) => win?.webContents.send('nexoUpdateState', state))
+    })
+  }
+  return prompt
+}
+
 function nexoUpdater(): Updater {
   if (!updater) {
     updater = new Updater({
@@ -25,44 +37,15 @@ function nexoUpdater(): Updater {
       platform: process.platform,
       arch: process.arch,
       downloadDir: path.join(app.getPath('temp'), 'nexo-update'),
-      confirm: async (update) => {
-        const win = await window()
-        const options: Electron.MessageBoxOptions = {
-          type: 'info',
-          title: i18next.t('update.availableTitle'),
-          message: i18next.t('update.availableMessage', { version: update.version }),
-          detail: [
-            i18next.t('update.currentVersion', { version: app.getVersion() }),
-            update.notes ?? ''
-          ]
-            .filter(Boolean)
-            .join('\n\n'),
-          buttons: [i18next.t('update.later'), i18next.t('update.installNow')],
-          defaultId: 1,
-          cancelId: 0
-        }
-        const { response } = win
-          ? await dialog.showMessageBox(win, options)
-          : await dialog.showMessageBox(options)
-        return response === 1
-      },
+      confirm: (update) => updatePrompt().confirm(update),
       onProgress: (ratio) => {
+        updatePrompt().progress(ratio)
         void window().then((win) => win?.setProgressBar(ratio))
       },
       // 安装包需要管理员权限：交给系统打开（会弹出 UAC），不能直接 spawn
       launch: (file) => shell.openPath(file),
       quit: () => app.quit(),
-      reportError: async (message) => {
-        const win = await window()
-        const options: Electron.MessageBoxOptions = {
-          type: 'error',
-          title: i18next.t('update.failedTitle'),
-          message: i18next.t('update.failedTitle'),
-          detail: message
-        }
-        if (win) await dialog.showMessageBox(win, options)
-        else await dialog.showMessageBox(options)
-      },
+      reportError: (message) => updatePrompt().error(message),
       log: { info: (m) => logger.info(m), warn: (m, e) => logger.warn(m, e) }
     })
   }
@@ -79,4 +62,16 @@ export function scheduleUpdateCheck(): void {
 /** 设置页“检查更新”按钮。开发环境照样检查（便于验证），但不会自动弹出。 */
 export async function nexoCheckForUpdate(): Promise<UpdateCheckResult> {
   return await nexoUpdater().checkManually()
+}
+
+export async function nexoGetUpdateState(): Promise<UpdatePromptState> {
+  return updatePrompt().getState()
+}
+
+export async function nexoUpdateRespond(accept: boolean): Promise<void> {
+  updatePrompt().respond(accept === true)
+}
+
+export async function nexoUpdateDismiss(): Promise<void> {
+  updatePrompt().dismiss()
 }

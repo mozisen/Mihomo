@@ -28,6 +28,7 @@ import { DEFAULT_CONTROL_DNS, DEFAULT_CONTROL_SNIFF } from '../../shared/appConf
 import { atomicWriteFile } from '../utils/safeFile'
 import { compileLocalRuntime } from '../local/service'
 import { isLocalProfile } from '../../shared/local-config'
+import { exitListenerPort, injectExitListener, setActiveExitGroup } from './exitListener'
 import { evaluateDnsOverrideGuard, type DnsOverrideGuardResult } from './dnsOverrideGuard'
 
 const factoryLogger = createLogger('Factory')
@@ -241,6 +242,11 @@ export async function generateProfile(
   if (['info', 'debug'].includes(coreProfile['log-level']) === false) {
     coreProfile['log-level'] = 'info'
   }
+  // 出口 IP 检测入站只写进内核配置，不出现在用户可见的运行时配置里
+  const exitGroup = injectExitListener(
+    coreProfile as unknown as Record<string, unknown>,
+    await exitListenerPort().catch(() => 0)
+  )
   const coreConfigStr = stringify(coreProfile)
   if (diffWorkDir && options.outputPath === undefined) {
     await prepareProfileWorkDir(profileId)
@@ -250,6 +256,9 @@ export async function generateProfile(
       (diffWorkDir ? mihomoWorkConfigPath(profileId) : mihomoWorkConfigPath('work')),
     coreConfigStr
   )
+  if (options.updateRuntimeConfig !== false && options.outputPath === undefined) {
+    setActiveExitGroup(exitGroup)
+  }
   if (options.updateRuntimeConfig !== false) {
     runtimeConfig = profile
     runtimeConfigStr = nextRuntimeConfigStr

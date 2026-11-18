@@ -69,6 +69,7 @@ describe('domainFromWebsite', () => {
   it('extracts a bare domain', () => {
     expect(domainFromWebsite('https://www.example.com/path')).toBe('example.com')
     expect(domainFromWebsite('example.net')).toBe('example.net')
+    expect(domainFromWebsite('http://en.chinatelecom.com.cn/')).toBe('chinatelecom.com.cn')
     expect(domainFromWebsite('')).toBeUndefined()
     expect(domainFromWebsite('http://')).toBeUndefined()
   })

@@ -39,7 +39,8 @@ export function domainFromWebsite(website?: string): string | undefined {
   if (!website) return undefined
   try {
     const host = new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`).hostname
-    return host.replace(/^www\./i, '') || undefined
+    // 去掉 www. 与语言前缀（en.chinatelecom.com.cn → chinatelecom.com.cn）
+    return host.replace(/^(www\d?|en)\./i, '') || undefined
   } catch {
     return undefined
   }

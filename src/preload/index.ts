@@ -10,6 +10,9 @@ const validInvokeChannels = [
   'nexoRefresh',
   'nexoRefreshOnline',
   'nexoCheckForUpdate',
+  'nexoGetUpdateState',
+  'nexoUpdateRespond',
+  'nexoUpdateDismiss',
   'nexoSiteLatency',
   'nexoExitIpInfo',
   // Mihomo API
@@ -151,6 +154,7 @@ const validListenChannels = [
   'ruleProvidersUpdated',
   'core-started',
   'nexoAccountChanged',
+  'nexoUpdateState',
   'dnsOverrideAutoDisabled'
 ] as const
 

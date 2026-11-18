@@ -26,23 +26,22 @@ export interface Response<T = unknown> {
   url: string
 }
 
-// 复用单个 session 用于代理请求
-let proxySession: Electron.Session | null = null
-let currentProxyUrl: string | null = null
-let proxySetupPromise: Promise<void> | null = null
+// 每个代理地址一个 session：同时经不同代理请求时互不切换代理
+const proxySessions = new Map<string, Promise<Electron.Session>>()
 
 async function getProxySession(proxyUrl: string): Promise<Electron.Session> {
-  if (!proxySession) {
-    proxySession = session.fromPartition('proxy-requests', { cache: false })
+  let pending = proxySessions.get(proxyUrl)
+  if (!pending) {
+    pending = (async () => {
+      const partition = `proxy-requests-${proxyUrl.replace(/[^a-z0-9]/gi, '_')}`
+      const s = session.fromPartition(partition, { cache: false })
+      await s.setProxy({ proxyRules: proxyUrl })
+      return s
+    })()
+    proxySessions.set(proxyUrl, pending)
+    pending.catch(() => proxySessions.delete(proxyUrl))
   }
-  if (currentProxyUrl !== proxyUrl) {
-    proxySetupPromise = proxySession.setProxy({ proxyRules: proxyUrl })
-    currentProxyUrl = proxyUrl
-  }
-  if (proxySetupPromise) {
-    await proxySetupPromise
-  }
-  return proxySession
+  return await pending
 }
 
 /**

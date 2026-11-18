@@ -27,6 +27,8 @@ describe('ExitIpDetails', () => {
     )
     expect(html).toContain('183.•••.•••.•••')
     expect(html).not.toContain('183.12.106.133')
+    // 首行是 IP，不再重复显示两次国家代码
+    expect(html).not.toContain('>CN<')
     expect(html).toMatch(/data-testid="ip-asn".*AS4134 - CHINANET BACKBONE/)
     expect(html).toMatch(/data-testid="ip-as-domain".*chinatelecom\.com\.cn/)
     expect(html).toMatch(/data-testid="ip-ip2location".*China, Guangdong, Shenzhen/)

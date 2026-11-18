@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoEye, IoEyeOff, IoRefresh } from 'react-icons/io5'
 import { nexoExitIpInfo } from '@renderer/utils/ipc'
-import { countryFlagEmoji } from '@renderer/utils/flag'
 import { FRAUD_SCORE_LEVELS, fraudScoreLevel, type ExitIpInfo } from '../../../../shared/netcheck'
 
 /** 隐藏 IP：只留首段，其余换成点 */
@@ -58,15 +57,11 @@ export const FraudScoreBar: React.FC<{ score: number }> = ({ score }) => {
 export const ExitIpDetails: React.FC<{ info: ExitIpInfo }> = ({ info }) => {
   const { t } = useTranslation()
   const [showIp, setShowIp] = useState(false)
-  const flag = countryFlagEmoji(info.countryCode)
   return (
     <>
-      <div className="flex items-center justify-between gap-4 py-2">
-        <span className="flex items-center gap-2 text-lg font-bold">
-          {flag && <span>{flag}</span>}
-          {info.countryCode ?? '—'}
-        </span>
-        <span className="flex items-center gap-1 font-mono text-sm" data-testid="exit-ip">
+      <div className="flex items-center justify-between gap-4 py-1 text-sm">
+        <span className="shrink-0 text-foreground-500">IP</span>
+        <span className="flex items-center gap-1 font-mono font-medium" data-testid="exit-ip">
           {showIp ? info.ip : maskIp(info.ip)}
           <Button
             size="sm"

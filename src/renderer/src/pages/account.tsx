@@ -212,7 +212,7 @@ export const AccountDetails: React.FC<{
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
         <SiteLatencyCard />
         <ExitIpCard />
       </div>
