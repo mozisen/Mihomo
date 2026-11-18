@@ -5,6 +5,8 @@ import { IoLogOutOutline, IoPersonCircle, IoRefresh } from 'react-icons/io5'
 import BasePage from '@renderer/components/base/base-page'
 import BaseConfirmModal from '@renderer/components/base/base-confirm-modal'
 import LoginPanel from '@renderer/components/nexo/login-panel'
+import SiteLatencyCard from '@renderer/components/nexo/site-latency-card'
+import ExitIpCard from '@renderer/components/nexo/exit-ip-card'
 import { useNexoAccount } from '@renderer/hooks/use-nexo-account'
 import { nexoLogout, nexoRefresh, nexoRefreshOnline } from '@renderer/utils/ipc'
 import { buildAccountView } from '@renderer/utils/nexo-account'
@@ -208,6 +210,11 @@ export const AccountDetails: React.FC<{
         >
           {t('account.action.logout')}
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <SiteLatencyCard />
+        <ExitIpCard />
       </div>
 
       {confirmLogout && (

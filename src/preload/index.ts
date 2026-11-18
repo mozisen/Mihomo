@@ -10,6 +10,8 @@ const validInvokeChannels = [
   'nexoRefresh',
   'nexoRefreshOnline',
   'nexoCheckForUpdate',
+  'nexoSiteLatency',
+  'nexoExitIpInfo',
   // Mihomo API
   'mihomoVersion',
   'mihomoCloseConnection',

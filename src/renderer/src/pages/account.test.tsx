@@ -34,7 +34,9 @@ vi.mock('@renderer/utils/ipc', () => ({
   nexoCancel2fa: vi.fn(),
   nexoLogout: vi.fn(),
   nexoRefresh: vi.fn(),
-  nexoRefreshOnline: vi.fn()
+  nexoRefreshOnline: vi.fn(),
+  nexoSiteLatency: vi.fn(),
+  nexoExitIpInfo: vi.fn(async () => new Promise(() => {}))
 }))
 
 const GB = 1024 ** 3
@@ -130,6 +132,15 @@ describe('Account page', () => {
     expect(html).toMatch(/data-testid="online-ips">account\.info\.onlineIps:1</)
     expect(html).toMatch(/data-testid="online-conns">account\.info\.onlineConns:16</)
     expect(html).not.toContain('1.2.3.4')
+  })
+
+  it('shows the site test and exit IP cards below the actions', () => {
+    account.state = { status: 'loggedIn', syncing: false, account: { username: 'alice' } }
+    const html = renderToStaticMarkup(<Account />)
+    expect(html.indexOf('data-testid="site-latency-card"')).toBeGreaterThan(
+      html.indexOf('account.action.updateConfig')
+    )
+    expect(html).toContain('data-testid="exit-ip-card"')
   })
 
   it('shows progress while the config is updating and a sync error', () => {

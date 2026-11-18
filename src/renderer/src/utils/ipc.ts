@@ -7,6 +7,7 @@ import type {
   TrafficUsageOverview
 } from '../../../shared/trafficUsage'
 import type { NexoAccountState } from '../../../shared/nexo'
+import type { ExitIpInfo, SiteKey } from '../../../shared/netcheck'
 
 function checkIpcError<T>(response: unknown): T {
   if (response && typeof response === 'object' && 'invokeError' in response) {
@@ -30,6 +31,8 @@ interface IpcApi {
   nexoLogout: () => Promise<void>
   nexoRefresh: () => Promise<NexoAccountState>
   nexoRefreshOnline: () => Promise<NexoAccountState>
+  nexoSiteLatency: (key: SiteKey) => Promise<number | null>
+  nexoExitIpInfo: () => Promise<ExitIpInfo>
   nexoCheckForUpdate: () => Promise<
     | { status: 'upToDate'; version: string }
     | { status: 'available'; version: string }
@@ -187,6 +190,8 @@ export const {
   nexoRefresh,
   nexoRefreshOnline,
   nexoCheckForUpdate,
+  nexoSiteLatency,
+  nexoExitIpInfo,
   // Mihomo API
   mihomoVersion,
   mihomoCloseConnection,

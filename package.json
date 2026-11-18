@@ -1,6 +1,6 @@
 {
   "name": "nexo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "nexo",
   "type": "module",
   "main": "./out/main/index.js",
