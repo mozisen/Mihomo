@@ -38,9 +38,11 @@ import {
   fixUserDataPermissions,
   setupPlatformSpecifics,
   setupAppLifecycle,
-  getSystemLanguage
+  getSystemLanguage,
+  isWindowsElevatedSync
 } from './lifecycle'
-import { configureAppPaths } from './utils/dirs'
+import { configureAppPaths, dataDir, exePath } from './utils/dirs'
+import { ensureElevatedTask, readTaskExe, relaunchElevatedSync } from './sys/elevatedLaunch'
 import { setTrafficUsageEnabled } from './traffic/recorder'
 
 async function getWindowsPowerShellMajorVersion(): Promise<number | null> {
@@ -94,7 +96,22 @@ subscribeAppConfig((config) => {
 
 export { mainWindow, showMainWindow, triggerMainWindow, closeMainWindow }
 
-const gotTheLock = app.requestSingleInstanceLock()
+// Windows：已授权过管理员权限时，普通权限启动直接交给计划任务以管理员身份重启（不弹 UAC）。
+// 必须在抢单实例锁之前，否则新进程会被当作第二实例。
+const relaunchedElevated = relaunchElevatedSync({
+  platform: process.platform,
+  packaged: app.isPackaged,
+  elevated: isWindowsElevatedSync(),
+  argv: process.argv,
+  exe: exePath(),
+  taskExe: process.platform === 'win32' ? readTaskExe(dataDir()) : undefined
+})
+if (relaunchedElevated) {
+  // 还没 ready，直接结束进程（app.exit 在 ready 前不保证立即退出）
+  process.exit(0)
+}
+
+const gotTheLock = !relaunchedElevated && app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 }
@@ -265,6 +282,10 @@ app
     const startupSafetyPromise = (async (): Promise<boolean> => {
       const isAdmin = await adminPromise
       await initAdminStatus()
+      // 以管理员身份运行过一次后登记计划任务，以后启动不再弹 UAC
+      if (isAdmin && app.isPackaged && process.platform === 'win32') {
+        void ensureElevatedTask(exePath(), dataDir(), mainLogger)
+      }
       if (!(await ensureSupportedWindowsPowerShell())) return false
       return ensureNoHighPrivilegeCore(isAdmin)
     })().catch((error) => {

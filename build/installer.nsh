@@ -63,6 +63,11 @@ Function un.DeleteUserDataPageLeave
 FunctionEnd
 
 !macro customUnInstall
+  # 删除“免 UAC 以管理员启动”的计划任务；升级安装时保留，避免每次更新后又要授权一次
+  ${ifNot} ${isUpdated}
+    nsExec::Exec '"$SYSDIR\schtasks.exe" /delete /tn "nexo-elevated" /f'
+    Pop $0
+  ${endIf}
   ${If} $deleteUserData == "1"
     # Electron user data is always stored for the current user.
     ${If} $installMode == "all"

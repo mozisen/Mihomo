@@ -50,3 +50,14 @@
 
 - `factory.ts` injects a local mixed listener (`nexo-exit-check`, `proxy: <节点选择 group>`) so the
   account page's exit IP reflects the selected node, not whatever the rules route ippure.com to.
+
+### Admin rights without repeated UAC (Windows)
+
+- `src/main/sys/elevatedLaunch.ts`: when running elevated, register the on-demand scheduled task
+  `nexo-elevated` (RunLevel HighestAvailable, arg `--nexo-elevated`) and write
+  `<dataDir>/elevated-task.json` with the exe path. A later non-elevated launch runs
+  `schtasks /run /tn nexo-elevated` **before** `requestSingleInstanceLock()` and `process.exit(0)`s.
+- Guards: never relaunch when already elevated, when `--nexo-elevated` is present (standard users
+  stay unelevated instead of looping), when argv carries a deep link, or when the marker's exe path
+  differs from the current one.
+- The NSIS uninstaller deletes the task unless `${isUpdated}` (so updates keep the grant).

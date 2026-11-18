@@ -67,15 +67,19 @@ export function setupPlatformSpecifics(): void {
   }
 }
 
-function isWindowsElevatedSync(): boolean | null {
+let elevatedSync: boolean | null | undefined
+
+export function isWindowsElevatedSync(): boolean | null {
   if (process.platform !== 'win32') return false
+  if (elevatedSync !== undefined) return elevatedSync
   try {
     execFileSync('fltmc', [], { stdio: 'ignore', windowsHide: true, timeout: 800 })
-    return true
+    elevatedSync = true
   } catch {
     // 只有成功结果可安全缓存；所有失败交给异步 fltmc + net session 回退确认。
-    return null
+    elevatedSync = null
   }
+  return elevatedSync
 }
 
 export function setupAppLifecycle(): void {
