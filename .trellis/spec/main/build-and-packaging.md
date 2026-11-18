@@ -37,3 +37,16 @@
 - Before publishing, smoke-test the built app: `npx electron-vite build`, run Electron
   with `--remote-debugging-port`, and check the page text via CDP and that the log has no
   "No handler registered".
+
+### Update prompt UI
+
+- Do not use `dialog.showMessageBox` for updates. `src/main/nexo/updatePrompt.ts` holds the state
+  (`idle | available | downloading | error`, type in `src/shared/update.ts`) and pushes it on the
+  `nexoUpdateState` channel; `components/nexo/update-modal.tsx` (mounted in `App.tsx`) renders it
+  with HeroUI. The renderer pulls `nexoGetUpdateState` on mount in case the prompt fired before the
+  window existed (silent start). Answers go back via `nexoUpdateRespond` / `nexoUpdateDismiss`.
+
+### Exit IP check
+
+- `factory.ts` injects a local mixed listener (`nexo-exit-check`, `proxy: <节点选择 group>`) so the
+  account page's exit IP reflects the selected node, not whatever the rules route ippure.com to.
